@@ -76,6 +76,8 @@ for i = 1:numel(Surface.BoundaryFacets)/3
     Surface.Normal(i,:) = Surface.Normal(i,:)/norm(Surface.Normal(i,:));
 end
 
+
+
 % now it's possible/easy to check for surfaces which are hit by a light ray
 % via < Light, surface_normal> > 0:
 
@@ -98,3 +100,34 @@ end
 % light(G, 'Style','infinite','Position',[-30,-30,90], 'Color', [1,1,1]);
 
 Light.Reflectance = diffuse(Surface.Normal(:,1),Surface.Normal(:,2),Surface.Normal(:,2),[-30,-30,50]);
+
+
+%calculate facets seen by light:
+Surface.Illuminated = Surface.BoundaryFacets(Surface.Normal*Light.Direction' < 0);
+Contact.RayNumber = zeros(size(Surface.Illuminated));
+Contact.Vertex = zeros([numel(Surface.Illuminated),3]);
+Contact.BoundaryFacet = zeros([numel(Surface.Illuminated),3]);
+
+% 
+for raynum = 1:numel(Light.Origin)/3
+    for i = 1:numel(Surface.BoundaryFacets)/3
+        rs = Light.Origin(raynum,:)' - Surface.Vertices(Surface.BoundaryFacet(i,1),:)'; % right hand side of equation
+        sysmat = [-Light.Direction', ...
+            Surface.Vertices(Surface.BoundaryFacet(i,2),:)'-Surface.Vertices(Surface.BoundaryFacet(i,1),:)',...
+            Surface.Vertices(Surface.BoundaryFacet(i,3),:)'-Surface.Vertices(Surface.BoundaryFacet(i,1),:)']; % System matrix of equation
+        sol = sysmat\rs;
+        t = sol(1);
+        beta = sol(2);
+        gamma = sol(3);
+        if ((beta > 0 && beta < 1) && (gamma > 0 && gamma < 1) && t >0)
+%             Contact.RefractDirection = [];
+%             Contact.ReflectDirection = [];
+            
+            Contact.RayNumber(i) = raynum;
+            Contact.Vertex(i,:) = Light.Origin(raynum,:) + t*Light.Direction;
+            Contact.BoundaryFacet(i,:) = Surface.BoundaryFacet(i,:);
+        end
+        
+    end
+end
+
