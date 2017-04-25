@@ -52,9 +52,9 @@ end
 clear('Pl','mi','ma','m','n','val','no','sur','x','vert','loaded','X','Y','contr');
 
 % Plot the "roof":
-surf(G,Surface.Roof(:,:,1),Surface.Roof(:,:,2),Surface.Roof(:,:,3),...
-    'FaceAlpha',1,'FaceLighting','gouraud','BackFaceLighting','unlit')
-hold on
+% surf(G,Surface.Roof(:,:,1),Surface.Roof(:,:,2),Surface.Roof(:,:,3),...
+%     'FaceAlpha',1,'FaceLighting','gouraud','BackFaceLighting','unlit')
+% hold on
 
 % Plot the bottle:
 plot(Surface.Bottle,'FaceAlpha',1,'FaceLighting','gouraud','BackFaceLighting','unlit');
@@ -83,19 +83,21 @@ end
 
 % new struct for light rays:
 Light = struct;
-Light.Direction = [0 1 2];
-Light.Direction = Light.Direction/norm(Light.Direction);
+Light.Direction = [0 -.5 -2];
+Light.Direction = Light.Direction/norm(Light.Direction,2);
 x = [0 0.25 1.5];
-Light.Origin = 20*(2*rand(180,3)-1)+80*x/norm(x);
+Light.Origin = 5*(2*rand(10,3)-1)+80*x/norm(x);
+% Light.Origin = [0.5 0 5] + 80*x/norm(x,2);
+% Light.Origin = [0.5 13.15 83.91];
 
-lambda = 40;
+lambda = 90;
 
 plot3(G,Light.Origin(:,1),Light.Origin(:,2),Light.Origin(:,3),'x');
 hold on
 for i = 1:numel(Light.Origin)/3
-    plot3(G,[Light.Origin(i,1), Light.Origin(i,1)-lambda*Light.Direction(1)],...
-          [Light.Origin(i,2), Light.Origin(i,2)-lambda*Light.Direction(2)],...
-          [Light.Origin(i,3), Light.Origin(i,3)-lambda*Light.Direction(3)], '-')
+    plot3(G,[Light.Origin(i,1), Light.Origin(i,1)+lambda*Light.Direction(1)],...
+          [Light.Origin(i,2), Light.Origin(i,2)+lambda*Light.Direction(2)],...
+          [Light.Origin(i,3), Light.Origin(i,3)+lambda*Light.Direction(3)], '-')
 end
 % light(G, 'Style','infinite','Position',[-30,-30,90], 'Color', [1,1,1]);
 
@@ -105,29 +107,40 @@ Light.Reflectance = diffuse(Surface.Normal(:,1),Surface.Normal(:,2),Surface.Norm
 %calculate facets seen by light:
 Surface.Illuminated = Surface.BoundaryFacets(Surface.Normal*Light.Direction' < 0);
 Contact.RayNumber = zeros(size(Surface.Illuminated));
-Contact.Vertex = zeros([numel(Surface.Illuminated),3]);
-Contact.BoundaryFacet = zeros([numel(Surface.Illuminated),3]);
+Contact.Vertex = zeros(size(Light.Origin));
+Contact.BoundaryFacet = zeros(size(Light.Origin));
+Contact.Ray_t = zeros(numel(Light.Origin)/3,1);
 
 % 
 for raynum = 1:numel(Light.Origin)/3
     for i = 1:numel(Surface.BoundaryFacets)/3
-        rs = Light.Origin(raynum,:)' - Surface.Vertices(Surface.BoundaryFacet(i,1),:)'; % right hand side of equation
+        rs = Light.Origin(raynum,:)' - Surface.Vertices(Surface.BoundaryFacets(i,1),:)'; % right hand side of equation
         sysmat = [-Light.Direction', ...
-            Surface.Vertices(Surface.BoundaryFacet(i,2),:)'-Surface.Vertices(Surface.BoundaryFacet(i,1),:)',...
-            Surface.Vertices(Surface.BoundaryFacet(i,3),:)'-Surface.Vertices(Surface.BoundaryFacet(i,1),:)']; % System matrix of equation
+            Surface.Vertices(Surface.BoundaryFacets(i,2),:)'-Surface.Vertices(Surface.BoundaryFacets(i,1),:)',...
+            Surface.Vertices(Surface.BoundaryFacets(i,3),:)'-Surface.Vertices(Surface.BoundaryFacets(i,1),:)']; % System matrix of equation
         sol = sysmat\rs;
         t = sol(1);
         beta = sol(2);
         gamma = sol(3);
-        if ((beta > 0 && beta < 1) && (gamma > 0 && gamma < 1) && t >0)
+
+        if ((beta > 0 && beta < 1) && (gamma > 0 && gamma < 1) && (t >0) && (beta+gamma<1))
 %             Contact.RefractDirection = [];
 %             Contact.ReflectDirection = [];
-            
-            Contact.RayNumber(i) = raynum;
-            Contact.Vertex(i,:) = Light.Origin(raynum,:) + t*Light.Direction;
-            Contact.BoundaryFacet(i,:) = Surface.BoundaryFacet(i,:);
+            disp(sol)
+            if (Contact.Ray_t(raynum) == 0)
+                Contact.RayNumber(i) = raynum;
+                Contact.Vertex(raynum,:) = Light.Origin(raynum,:) + t*Light.Direction;
+                Contact.BoundaryFacets(raynum,:) = Surface.BoundaryFacets(i,:);
+                Contact.Ray_t(raynum) = t;
+            elseif (Contact.Ray_t(raynum) > t)
+                Contact.RayNumber(i) = raynum;
+                Contact.Vertex(raynum,:) = Light.Origin(raynum,:) + t*Light.Direction;
+                Contact.BoundaryFacets(raynum,:) = Surface.BoundaryFacets(i,:);
+                Contact.Ray_t(raynum) = t;
+            end
+            plot3(Contact.Vertex(raynum,1), Contact.Vertex(raynum,2), Contact.Vertex(raynum,3), 'b*')
         end
-        
     end
+    
 end
 
