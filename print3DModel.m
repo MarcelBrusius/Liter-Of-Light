@@ -26,7 +26,7 @@ sur = vert(x,:);
 val = sur(1,3);
 
 %Generate the "roof":
-[X,Y] = meshgrid(-100:1:100,-100:1:100);
+[X,Y] = meshgrid(-20:.5:20,-20:.5:20);
 no = zeros(1,sum(x));
 for i = 1:sum(x)
     no(i) =norm(sur(i,[1,2]));
@@ -52,12 +52,12 @@ end
 clear('Pl','mi','ma','m','n','val','no','sur','x','vert','loaded','X','Y','contr');
 
 % Plot the "roof":
-% surface(G,Surface.Roof(:,:,1),Surface.Roof(:,:,2),Surface.Roof(:,:,3))
-% hold on
+surf(G,Surface.Roof(:,:,1),Surface.Roof(:,:,2),Surface.Roof(:,:,3),...
+    'FaceAlpha',1,'FaceLighting','gouraud','BackFaceLighting','unlit')
+hold on
 
 % Plot the bottle:
-plot(Surface.Bottle);
-axis image
+plot(Surface.Bottle,'FaceAlpha',.4,'FaceLighting','gouraud','BackFaceLighting','unlit');
 % trisurf(k,vert(:,1),vert(:,2),vert(:,3));
 % axis image
 % alpha(0.3)
@@ -92,4 +92,4 @@ end
 %       [Light.Origin(:,2), Light.Origin(:,2)-Light.Direction(2)],...
 %       [Light.Origin(:,3), Light.Origin(:,3)-Light.Direction(3)])
 
-light(G, 'Style','infinite','Position',[-1,-1,-2]);
+light(G, 'Style','local','Position',[-30,-30,200], 'Color', [1,0,0]);
