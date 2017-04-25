@@ -17,8 +17,8 @@ Surface = struct;
 
 % create the bottle as an "alphaShape" with adjusted "AlphaRadius" in order
 % to ease work with the surface:
-Surface.AlphaShape = alphaShape(vert(:,1),vert(:,2),vert(:,3));
-Surface.AlphaShape.Alpha = 10;
+Surface.Bottle = alphaShape(vert(:,1),vert(:,2),vert(:,3));
+Surface.Bottle.Alpha = 10;
 
 x = (vert(:,3) < 36 & vert(:,3) > 35);
 sur = vert(x,:);
@@ -41,22 +41,21 @@ Pl(:,:,3) = val*ones(size(X));
 
 Pl = reshape(Pl, [n*m,3]);
 contr = sqrt(sum(Pl(:,[1,2]).^2,2));
-c = (contr < ma); % cut a circle out for the bottle
-Pl(c,3) = 0;
+Pl(contr < ma,3) = 0; % cut a circle out for the bottle
 
 Surface.Roof = zeros(m,n,3);
 for i = 1:3
     Surface.Roof(:,:,i) = reshape(Pl(:,i),[m,n]);
 end
 
-clear('Pl','mi','ma','m','n','val','no','sur','x','vert','loaded','X','Y','contr','c');
+clear('Pl','mi','ma','m','n','val','no','sur','x','vert','loaded','X','Y','contr');
 
 % Plot the "roof":
 surf(Surface.Roof(:,:,1),Surface.Roof(:,:,2),Surface.Roof(:,:,3))
 hold on
 
 % Plot the bottle:
-plot(Surface.AlphaShape);
+plot(Surface.Bottle);
 axis image
 % trisurf(k,vert(:,1),vert(:,2),vert(:,3));
 % axis image
@@ -66,7 +65,7 @@ hold off
 
 % boundary facets (represented by triangle vertices in every row) given in
 % "k", or accessible via alphaShape's boundaryFacets function:
-[Surface.BoundaryFacets,Surface.Vertices]= boundaryFacets(Surface.AlphaShape);
+[Surface.BoundaryFacets,Surface.Vertices]= boundaryFacets(Surface.Bottle);
 
 % compute surface representation using "normal vectors" for ease of use:
 Surface.Normal = zeros(size(Surface.BoundaryFacets));
@@ -78,4 +77,18 @@ end
 % now it's possible/easy to check for surfaces which are hit by a light ray
 % via < Light, surface_normal> > 0:
 
+% new struct for light rays:
+% Light = struct;
+% Light.Direction = [-2;-1;-2];
+% Light.Origin = 16*rand(20,3)+16;
+% 
+% lambda = 5;
+% 
+% figure(2);
+% plot3(Light.Origin(:,1),Light.Origin(:,2),Light.Origin(:,3),'x');
+% hold on
+% plot3([Light.Origin(:,1), Light.Origin(:,1)-Light.Direction(1)],...
+%       [Light.Origin(:,2), Light.Origin(:,2)-Light.Direction(2)],...
+%       [Light.Origin(:,3), Light.Origin(:,3)-Light.Direction(3)])
 
+Light =

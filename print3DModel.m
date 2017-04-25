@@ -6,7 +6,8 @@
 loaded = load('Bottle.mat');
 vert = loaded.vert;
 
-figure(1)
+F = figure;
+G = axes(F);
 
 % create struct for better overview:
 Surface = struct;
@@ -51,8 +52,8 @@ end
 clear('Pl','mi','ma','m','n','val','no','sur','x','vert','loaded','X','Y','contr');
 
 % Plot the "roof":
-surf(Surface.Roof(:,:,1),Surface.Roof(:,:,2),Surface.Roof(:,:,3))
-hold on
+% surface(G,Surface.Roof(:,:,1),Surface.Roof(:,:,2),Surface.Roof(:,:,3))
+% hold on
 
 % Plot the bottle:
 plot(Surface.Bottle);
@@ -78,5 +79,17 @@ end
 % via < Light, surface_normal> > 0:
 
 % new struct for light rays:
-Light = struct;
+% Light = struct;
+% Light.Direction = [-2;-1;-2];
+% Light.Origin = 16*rand(20,3)+16;
+% 
+% lambda = 5;
+% 
+% figure(2);
+% plot3(Light.Origin(:,1),Light.Origin(:,2),Light.Origin(:,3),'x');
+% hold on
+% plot3([Light.Origin(:,1), Light.Origin(:,1)-Light.Direction(1)],...
+%       [Light.Origin(:,2), Light.Origin(:,2)-Light.Direction(2)],...
+%       [Light.Origin(:,3), Light.Origin(:,3)-Light.Direction(3)])
 
+light(G, 'Style','infinite','Position',[-1,-1,-2]);
