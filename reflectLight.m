@@ -1,4 +1,4 @@
-function [ Direction ] = reflectLight( Surface, Light )
+function [ Direction ] = reflectLight( Surface,Light ,NumFacet)
 %REFLECTLIGHT Calculate reflection of light at a surface
 %   Compute reflection of light at a surface of an object given by
 %   triangular patches.
@@ -7,6 +7,7 @@ function [ Direction ] = reflectLight( Surface, Light )
 %   Surface.Normal. (The refraction coefficients are given by nOutside and
 %   nInside for the respective media).
 
+Direction = Light.Direction - dot(Surface.Normal(NumFacet,:),Light.Direction)*Surface.Normal(NumFacet,:);
 
 end
 
