@@ -82,32 +82,17 @@ end
 % via < Light, surface_normal> > 0:
 
 % new struct for light rays:
-Light = struct;
-Light.Direction = [0 -.5 -2];
-Light.Direction = Light.Direction/norm(Light.Direction,2);
 x = [0 0.25 1.5];
-Light.Origin = 5*(2*rand(200,3)-1)+80*x/norm(x);
-% Light.Origin = [0.5 0 5] + 80*x/norm(x,2);
-% Light.Origin = [0.5 13.15 83.91];
-
-lambda = 90;
-
-plot3(G,Light.Origin(:,1),Light.Origin(:,2),Light.Origin(:,3),'x');
-hold on
-for i = 1:numel(Light.Origin)/3
-    plot3(G,[Light.Origin(i,1), Light.Origin(i,1)+lambda*Light.Direction(1)],...
-          [Light.Origin(i,2), Light.Origin(i,2)+lambda*Light.Direction(2)],...
-          [Light.Origin(i,3), Light.Origin(i,3)+lambda*Light.Direction(3)], '-')
-end
-% light(G, 'Style','infinite','Position',[-30,-30,90], 'Color', [1,1,1]);
-
-Light.Reflectance = diffuse(Surface.Normal(:,1),Surface.Normal(:,2),Surface.Normal(:,2),[-30,-30,50]);
-
+Origin = 5*(2*rand(200,3)-1)+80*x/norm(x);
+% Origin = [0.5 0 5] + 80*x/norm(x,2);
+% Origin = [0.5 13.15 83.91];
+Direction = [0 -.5 -2];
+Light = createLight(Direction,Origin,1);
 
 %calculate facets seen by light:
 Surface.Illuminated = Surface.BoundaryFacets(Surface.Normal*Light.Direction' < 0);
 
-
+[Refraction, ~] = RayTrace(Surface,Light);
 % 
 
 

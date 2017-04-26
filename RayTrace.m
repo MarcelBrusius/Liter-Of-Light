@@ -1,5 +1,5 @@
-function [ Refraction ] = RayTrace( Surface , Light )
-%UNTITLED Computes ray tracing for light rays
+function [ Refraction, Reflection ] = RayTrace( Surface , Light )
+%RAYTRACE Computes ray tracing for light rays
 %   Computes intersection of light rays given in Light.Origin with
 %   direction Light.Direction onto a triangular surface given in Surface
 %   with vertices Surface.Vertices and boundary facets
@@ -7,7 +7,7 @@ function [ Refraction ] = RayTrace( Surface , Light )
 %
 %   Return a struct containing the intersection points of rays with
 %   triangles on surface as Refraction.Origin and their direction via
-%   Fresnel's equations
+%   Fresnel's equations and Snell's Law (external function)
 
     Contact.RayNumber = zeros(size(Surface.Illuminated));
     Contact.Vertex = zeros(size(Light.Origin));
@@ -38,9 +38,12 @@ function [ Refraction ] = RayTrace( Surface , Light )
         Contact.BoundaryFacets(raynum,:) = Surface.BoundaryFacets(i,:);
         plot3(Contact.Vertex(raynum,1), Contact.Vertex(raynum,2), Contact.Vertex(raynum,3), 'r*')
 
+        nAir = 1;
+        nWater = 1.33;
         Refraction.Origin = Contact.Vertex;
-%         Refraction.Direction = refractLight(Contact, Light); %To be
-%         implemented
+        Refraction.Direction = refractLight(Contact, Light, nAir, nWater);
+%         Reflection.Direction = reflectLight(Contact, Light, nAir, nWater);
+        
     end
 end
 
