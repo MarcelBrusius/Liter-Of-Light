@@ -22,8 +22,7 @@ function [ Light ] = createLight( Direction, Origin, varargin )
     % new struct for light rays:
     Light = struct;
     Light.Direction = Direction/norm(Direction,2);
-    x = [0 0.25 1.5];
-    Light.Origin = 5*(2*rand(200,3)-1)+80*x/norm(x);
+    Light.Origin = Origin;
 
 
     lambda = 90;
