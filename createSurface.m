@@ -16,6 +16,8 @@ function [ Surface ] = createSurface(vert)
 %   Surface.BoundaryFacets: contains the boundary facets defining the
 %                           surface
 
+G = gca; %get current axes
+
 % create struct for better overview:
 Surface = struct;
 
