@@ -25,6 +25,9 @@ function [ Refraction ] = RayTrace( Surface , Light , varargin)
     Contact.Ray_t = zeros(numel(Light.Origin)/3,1);
     Contact.Mask = false(numel(Surface.BoundaryFacets)/3,1);
     Contact.Facet = zeros(numel(Light.Origin),1);
+    
+    Refraction.Direction = zeros(size(Surface.BoundaryFacets));
+    Refraction.Origin = zeros(numel(Light.Origin)/3,3);
 
     for raynum = 1:numel(Light.Origin)/3
         for i = 1:numel(Surface.BoundaryFacets)/3
@@ -49,26 +52,29 @@ function [ Refraction ] = RayTrace( Surface , Light , varargin)
                 end
             end
         end
-        
-        Contact.Vertex(raynum,:) = Light.Origin(raynum,:) + Contact.Ray_t(raynum)*Light.Direction;
-        Contact.BoundaryFacets(raynum,:) = Surface.BoundaryFacets(i,:);
-        Contact.Mask(Contact.Facet(raynum)) = 1;
-        if flag == 1
-            plot3(G,Contact.Vertex(raynum,1), Contact.Vertex(raynum,2), Contact.Vertex(raynum,3), 'r*')
-        end
-                
+        if Contact.Facet(raynum)>0
+            Contact.Vertex(raynum,:) = Light.Origin(raynum,:) + Contact.Ray_t(raynum)*Light.Direction(numray,:);
+            Contact.BoundaryFacets(raynum,:) = Surface.BoundaryFacets(i,:);
+            Contact.Mask(Contact.Facet(raynum)) = true;
+            if flag == 1
+                plot3(G,Contact.Vertex(raynum,1), Contact.Vertex(raynum,2), Contact.Vertex(raynum,3), 'r*')
+            end
 
-        nAir = 1;
-        nWater = 1.33;
-        Refraction.Origin = Contact.Vertex;
-        Refraction.Direction = refractLight(Surface, Light, Contact.Facet(raynum), nAir, nWater);
-%         Reflection.Direction = reflectLight(Contact, Light, nAir, nWater);
-        plot3(G,Light.Origin(raynum,1),Light.Origin(raynum,2),Light.Origin(raynum,3),'bx');
-        hold on
-        
-        plot3(G,[Light.Origin(raynum,1), Light.Origin(raynum,1)+Contact.Ray_t(raynum)*Light.Direction(1)],...
-                [Light.Origin(raynum,2), Light.Origin(raynum,2)+Contact.Ray_t(raynum)*Light.Direction(2)],...
-                [Light.Origin(raynum,3), Light.Origin(raynum,3)+Contact.Ray_t(raynum)*Light.Direction(3)], 'b-')
+
+            nAir = 1;
+            nWater = 1.33;
+            Refraction.Origin = Contact.Vertex;
+            Refraction.Direction(Contact.Facet(raynum),:) = refractLight(Surface, Light, Contact.Facet(raynum), nAir, nWater);
+    %         Reflection.Direction = reflectLight(Contact, Light, nAir, nWater);
+            plot3(G,Light.Origin(raynum,1),Light.Origin(raynum,2),Light.Origin(raynum,3),'bx');
+            hold on
+
+            plot3(G,[Light.Origin(raynum,1), Light.Origin(raynum,1)+Contact.Ray_t(raynum)*Light.Direction(numray,1)],...
+                    [Light.Origin(raynum,2), Light.Origin(raynum,2)+Contact.Ray_t(raynum)*Light.Direction(numray,2)],...
+                    [Light.Origin(raynum,3), Light.Origin(raynum,3)+Contact.Ray_t(raynum)*Light.Direction(numray,3)], 'b-')
+        end
     end
+    Refraction.Direction = Refraction.Direction(Contact.Mask,:);
+    Refraction.Origin = Refraction.Origin(Contact.Mask,:);
 end
 
