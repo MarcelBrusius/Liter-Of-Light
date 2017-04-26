@@ -86,7 +86,7 @@ Light = struct;
 Light.Direction = [0 -.5 -2];
 Light.Direction = Light.Direction/norm(Light.Direction,2);
 x = [0 0.25 1.5];
-Light.Origin = 5*(2*rand(10,3)-1)+80*x/norm(x);
+Light.Origin = 5*(2*rand(200,3)-1)+80*x/norm(x);
 % Light.Origin = [0.5 0 5] + 80*x/norm(x,2);
 % Light.Origin = [0.5 13.15 83.91];
 
@@ -126,21 +126,18 @@ for raynum = 1:numel(Light.Origin)/3
         if ((beta > 0 && beta < 1) && (gamma > 0 && gamma < 1) && (t >0) && (beta+gamma<1))
 %             Contact.RefractDirection = [];
 %             Contact.ReflectDirection = [];
-            disp(sol)
             if (Contact.Ray_t(raynum) == 0)
-                Contact.RayNumber(i) = raynum;
-                Contact.Vertex(raynum,:) = Light.Origin(raynum,:) + t*Light.Direction;
-                Contact.BoundaryFacets(raynum,:) = Surface.BoundaryFacets(i,:);
                 Contact.Ray_t(raynum) = t;
             elseif (Contact.Ray_t(raynum) > t)
-                Contact.RayNumber(i) = raynum;
-                Contact.Vertex(raynum,:) = Light.Origin(raynum,:) + t*Light.Direction;
-                Contact.BoundaryFacets(raynum,:) = Surface.BoundaryFacets(i,:);
                 Contact.Ray_t(raynum) = t;
+                disp(t)
             end
-            plot3(Contact.Vertex(raynum,1), Contact.Vertex(raynum,2), Contact.Vertex(raynum,3), 'b*')
         end
     end
+    Contact.RayNumber(i) = raynum;
+    Contact.Vertex(raynum,:) = Light.Origin(raynum,:) + Contact.Ray_t(raynum)*Light.Direction;
+    Contact.BoundaryFacets(raynum,:) = Surface.BoundaryFacets(i,:);
+    plot3(Contact.Vertex(raynum,1), Contact.Vertex(raynum,2), Contact.Vertex(raynum,3), 'r*')
     
 end
 
