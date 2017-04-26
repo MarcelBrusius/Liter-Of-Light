@@ -11,8 +11,13 @@ function [ Refraction ] = RayTrace( Surface , Light , varargin)
 
     if numel(varargin) == 1
         flag = varargin{1};
+        color = 'b';
     elseif numel(varargin) == 0
         flag = 0;
+        color = 'b';
+    elseif numel(varargin) == 2
+        color = varargin{2};
+        flag = varargin{1};
     else
         error('Too many input arguments');
     end
@@ -59,21 +64,21 @@ function [ Refraction ] = RayTrace( Surface , Light , varargin)
             Contact.BoundaryFacets(raynum,:) = Surface.BoundaryFacets(i,:);
             Contact.Mask(raynum) = true;
             if flag == 1
-                plot3(G,Contact.Vertex(raynum,1), Contact.Vertex(raynum,2), Contact.Vertex(raynum,3), 'r*')
+%                 plot3(G,Contact.Vertex(raynum,1), Contact.Vertex(raynum,2), Contact.Vertex(raynum,3), 'r*')
+%                 hold on
+%                 plot3(G,Light.Origin(raynum,1),Light.Origin(raynum,2),Light.Origin(raynum,3),'bx');
+%                 hold on
+                plot3(G,[Light.Origin(raynum,1), Light.Origin(raynum,1)+Contact.Ray_t(raynum)*Light.Direction(raynum,1)],...
+                    [Light.Origin(raynum,2), Light.Origin(raynum,2)+Contact.Ray_t(raynum)*Light.Direction(raynum,2)],...
+                    [Light.Origin(raynum,3), Light.Origin(raynum,3)+Contact.Ray_t(raynum)*Light.Direction(raynum,3)], [color,'-'])
+                
             end
-
-
             nAir = 1;
             nWater = 1.33;
             Refraction.Origin = Contact.Vertex;
             Refraction.Direction(raynum,:) = refractLight(Surface.Normal(Contact.Facet(raynum),:), Light.Direction(raynum,:), nAir, nWater);
     %         Reflection.Direction = reflectLight(Contact, Light, nAir, nWater);
-            plot3(G,Light.Origin(raynum,1),Light.Origin(raynum,2),Light.Origin(raynum,3),'bx');
-            hold on
 
-            plot3(G,[Light.Origin(raynum,1), Light.Origin(raynum,1)+Contact.Ray_t(raynum)*Light.Direction(raynum,1)],...
-                    [Light.Origin(raynum,2), Light.Origin(raynum,2)+Contact.Ray_t(raynum)*Light.Direction(raynum,2)],...
-                    [Light.Origin(raynum,3), Light.Origin(raynum,3)+Contact.Ray_t(raynum)*Light.Direction(raynum,3)], 'b-')
         end
     end
     Refraction.Direction = Refraction.Direction(Contact.Mask,:);
