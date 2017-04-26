@@ -11,9 +11,9 @@ function [ Light ] = createLight( Direction, Origin, varargin )
 %                         rays specified by Origin
 %
 
-    if varargin == 1
+    if numel(varargin) == 1
         flag = varargin{1};
-    elseif varargin == 0
+    elseif numel(varargin) == 0
         flag = 0;
     else
         error('To many input arguments.');

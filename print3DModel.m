@@ -7,7 +7,7 @@ loaded = load('Bottle.mat');
 vert = loaded.vert;
 
 F = figure;
-G = axes(F);
+G = axes;%(F);
 
 % create struct for better overview:
 Surface = struct;
@@ -83,7 +83,7 @@ end
 
 % new struct for light rays:
 x = [0 0.25 1.5];
-Origin = 5*(2*rand(200,3)-1)+80*x/norm(x);
+Origin = 5*(2*rand(1,3)-1)+80*x/norm(x);
 % Origin = [0.5 0 5] + 80*x/norm(x,2);
 % Origin = [0.5 13.15 83.91];
 Direction = [0 -.5 -2];
