@@ -106,38 +106,8 @@ Light.Reflectance = diffuse(Surface.Normal(:,1),Surface.Normal(:,2),Surface.Norm
 
 %calculate facets seen by light:
 Surface.Illuminated = Surface.BoundaryFacets(Surface.Normal*Light.Direction' < 0);
-Contact.RayNumber = zeros(size(Surface.Illuminated));
-Contact.Vertex = zeros(size(Light.Origin));
-Contact.BoundaryFacet = zeros(size(Light.Origin));
-Contact.Ray_t = zeros(numel(Light.Origin)/3,1);
+
 
 % 
-for raynum = 1:numel(Light.Origin)/3
-    for i = 1:numel(Surface.BoundaryFacets)/3
-        rs = Light.Origin(raynum,:)' - Surface.Vertices(Surface.BoundaryFacets(i,1),:)'; % right hand side of equation
-        sysmat = [-Light.Direction', ...
-            Surface.Vertices(Surface.BoundaryFacets(i,2),:)'-Surface.Vertices(Surface.BoundaryFacets(i,1),:)',...
-            Surface.Vertices(Surface.BoundaryFacets(i,3),:)'-Surface.Vertices(Surface.BoundaryFacets(i,1),:)']; % System matrix of equation
-        sol = sysmat\rs;
-        t = sol(1);
-        beta = sol(2);
-        gamma = sol(3);
 
-        if ((beta > 0 && beta < 1) && (gamma > 0 && gamma < 1) && (t >0) && (beta+gamma<1))
-%             Contact.RefractDirection = [];
-%             Contact.ReflectDirection = [];
-            if (Contact.Ray_t(raynum) == 0)
-                Contact.Ray_t(raynum) = t;
-            elseif (Contact.Ray_t(raynum) > t)
-                Contact.Ray_t(raynum) = t;
-                disp(t)
-            end
-        end
-    end
-    Contact.RayNumber(i) = raynum;
-    Contact.Vertex(raynum,:) = Light.Origin(raynum,:) + Contact.Ray_t(raynum)*Light.Direction;
-    Contact.BoundaryFacets(raynum,:) = Surface.BoundaryFacets(i,:);
-    plot3(Contact.Vertex(raynum,1), Contact.Vertex(raynum,2), Contact.Vertex(raynum,3), 'r*')
-    
-end
 
