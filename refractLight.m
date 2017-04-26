@@ -1,4 +1,4 @@
-function [ Direction ] = refractLight( Surface, Light, NumFacet, nOutside, nInside )
+function [ Direction ] = refractLight( Normal, Direction, nOutside, nInside )
 %REFRACTLIGHT Calculate refraction of light at a surface
 %   Compute refraction of light at a surface of an object given by
 %   triangular patches using Snell's law
@@ -10,9 +10,9 @@ function [ Direction ] = refractLight( Surface, Light, NumFacet, nOutside, nInsi
     % Calculate the direction of the refraction with Snells Law
 %     nOutside=1; 
 %     nInside=1.33;
-    Direction = nOutside/nInside*cross(Surface.Normal(NumFacet,:),cross(-Surface.Normal(NumFacet,:),Light.Direction)) ...
-        - Surface.Normal(NumFacet,:)*sqrt(1-(nOutside/nInside)^2*dot(cross(Surface.Normal(NumFacet,:),Light.Direction),...
-        cross(Surface.Normal(NumFacet,:),Light.Direction))); % Snells Law (vector form)
+    Direction = nOutside/nInside*cross(Norma,cross(-Normal,Direction)) ...
+        - Normal*sqrt(1-(nOutside/nInside)^2*dot(cross(Normal,Direction),...
+        cross(Normal,Direction))); % Snells Law (vector form)
     
     
 %   Test for vectorized version:

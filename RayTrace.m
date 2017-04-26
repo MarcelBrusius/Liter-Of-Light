@@ -64,7 +64,7 @@ function [ Refraction ] = RayTrace( Surface , Light , varargin)
             nAir = 1;
             nWater = 1.33;
             Refraction.Origin = Contact.Vertex;
-            Refraction.Direction(Contact.Facet(raynum),:) = refractLight(Surface, Light, Contact.Facet(raynum), nAir, nWater);
+            Refraction.Direction(Contact.Facet(raynum),:) = refractLight(Surface.Normal(Contact.Facet(raynum),:), Light.Direction(raynum,:), nAir, nWater);
     %         Reflection.Direction = reflectLight(Contact, Light, nAir, nWater);
             plot3(G,Light.Origin(raynum,1),Light.Origin(raynum,2),Light.Origin(raynum,3),'bx');
             hold on

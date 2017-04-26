@@ -24,7 +24,7 @@ Direction = [0 -.5 -2];
 Light = createLight(Direction,Origin);
 
 %calculate facets seen by light:
-Surface.Illuminated = Surface.BoundaryFacets(Surface.Normal*Light.Direction' < 0);
+% Surface.Illuminated = Surface.BoundaryFacets(Surface.Normal*Light.Direction' < 0);
 
 Refraction = RayTrace(Surface,Light,1);
 
