@@ -40,10 +40,10 @@ function [ Refraction ] = RayTrace( Surface , Light , varargin)
     Refraction.Origin = zeros(size(Light.Origin));
 
     for raynum = 1:numel(Light.Origin)/3
-        if numcalls == 1
-            possiblelightrays = find(Surface.Normal*Light.Direction(raynum,:)'<0);
-        else 
+        if Surface.Bottle.inShape(Light.Origin)
             possiblelightrays = find(Surface.Normal*Light.Direction(raynum,:)'>0);
+        else 
+            possiblelightrays = find(Surface.Normal*Light.Direction(raynum,:)'<0);
         end
         for i = possiblelightrays'
             rs = Light.Origin(raynum,:)' - Surface.Vertices(Surface.BoundaryFacets(i,1),:)'; % right hand side of equation
