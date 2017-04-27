@@ -9,15 +9,18 @@ function [ Refraction ] = RayTrace( Surface , Light , varargin)
 %   triangles on surface as Refraction.Origin and their direction via
 %   Fresnel's equations and Snell's Law (external function)
 
-    if numel(varargin) == 1
-        flag = varargin{1};
+    if numel(varargin) == 2
+        numcalls = varargin{1};
+        flag = varargin{2};
         color = 'b';
     elseif numel(varargin) == 0
-        flag = 0;
-        color = 'b';
-    elseif numel(varargin) == 2
-        color = varargin{2};
-        flag = varargin{1};
+        error('not enough input arguments.');
+    elseif numel(varargin) == 3
+        color = varargin{3};
+        flag = varargin{2}
+        numcalls = varargin{1};
+    elseif numel(varargin) == 1
+        numcalls = varargin{1};
     else
         error('Too many input arguments');
     end
@@ -37,7 +40,12 @@ function [ Refraction ] = RayTrace( Surface , Light , varargin)
     Refraction.Origin = zeros(size(Light.Origin));
 
     for raynum = 1:numel(Light.Origin)/3
-        for i = 1:numel(Surface.BoundaryFacets)/3
+        if numcalls == 1
+            possiblelightrays = find(Surface.Normal*Light.Direction(raynum,:)'<0);
+        else 
+            possiblelightrays = find(Surface.Normal*Light.Direction(raynum,:)'>0);
+        end
+        for i = possiblelightrays'
             rs = Light.Origin(raynum,:)' - Surface.Vertices(Surface.BoundaryFacets(i,1),:)'; % right hand side of equation
             sysmat = [-Light.Direction(raynum,:)', ...
                 Surface.Vertices(Surface.BoundaryFacets(i,2),:)'-Surface.Vertices(Surface.BoundaryFacets(i,1),:)',...
@@ -64,8 +72,8 @@ function [ Refraction ] = RayTrace( Surface , Light , varargin)
             Contact.BoundaryFacets(raynum,:) = Surface.BoundaryFacets(i,:);
             Contact.Mask(raynum) = true;
             if flag == 1
-%                 plot3(G,Contact.Vertex(raynum,1), Contact.Vertex(raynum,2), Contact.Vertex(raynum,3), 'r*')
-%                 hold on
+                plot3(G,Contact.Vertex(raynum,1), Contact.Vertex(raynum,2), Contact.Vertex(raynum,3), 'r*')
+                hold on
 %                 plot3(G,Light.Origin(raynum,1),Light.Origin(raynum,2),Light.Origin(raynum,3),'bx');
 %                 hold on
                 plot3(G,[Light.Origin(raynum,1), Light.Origin(raynum,1)+Contact.Ray_t(raynum)*Light.Direction(raynum,1)],...
