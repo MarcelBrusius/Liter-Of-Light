@@ -68,7 +68,7 @@ function [ Surface ] = createSurface(vert)
     % Plot the bottle:
     plot(Surface.Bottle,'FaceAlpha',1,'FaceLighting','gouraud','BackFaceLighting','unlit');
     % trisurf(k,vert(:,1),vert(:,2),vert(:,3));
-    % axis image
+%     axis square
     % alpha(0.3)
 
     hold on
