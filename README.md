@@ -7,5 +7,5 @@ During daytime this design performs like a light bulb and delivers light equival
 
 ## Aim:
 + Can we model the light bottle to verify the amount of light reaching the interior of a hovel? 
-+ Is it really 40-60 watt, how deep to we have to mount the bottle into the roof and which role does the shape of the bottle play? 
++ Is it really 40-60 watt, how deep do we have to mount the bottle into the roof and which role does the shape of the bottle play? 
 + Is it even possible to compute an ideal shape for the bottle? 
