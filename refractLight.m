@@ -10,10 +10,13 @@ function [ Direction ] = refractLight( Normal, Direction, nOutside, nInside )
     % Calculate the direction of the refraction with Snells Law
 %     nOutside=1; 
 %     nInside=1.33;
-    Direction = nOutside/nInside*cross(Normal,cross(-Normal,Direction)) ...
+    Dir = nOutside/nInside*cross(Normal,cross(-Normal,Direction)) ...
         - Normal*sqrt(1-(nOutside/nInside)^2*dot(cross(Normal,Direction),...
         cross(Normal,Direction))); % Snells Law (vector form)
-    
+    if ~isreal(Dir)
+        pause
+    end
+        
     
 %   Test for vectorized version:
     
