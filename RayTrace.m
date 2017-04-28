@@ -1,4 +1,4 @@
-function [ Refraction ] = RayTrace( Surface , Light , varargin)
+function [ Refraction, Reflection ] = RayTrace( Surface , Light , varargin)
 %RAYTRACE Computes ray tracing for light rays
 %   Computes intersection of light rays given in Light.Origin with
 %   direction Light.Direction onto a triangular surface given in Surface
@@ -9,12 +9,6 @@ function [ Refraction ] = RayTrace( Surface , Light , varargin)
 %   triangles on surface as Refraction.Origin and their direction via
 %   Fresnel's equations and Snell's Law (external function)
     if numel(varargin) == 1
-        flag = varargin{1};
-        color = 'b';
-    elseif numel(varargin) == 0
-        error('not enough input arguments.');
-    elseif numel(varargin) == 2
-        color = varargin{2}
         flag = varargin{1};
     else
         error('Too many input arguments');
@@ -33,12 +27,20 @@ function [ Refraction ] = RayTrace( Surface , Light , varargin)
     
     Refraction.Direction = zeros(size(Light.Origin));
     Refraction.Origin = zeros(size(Light.Origin));
+    
+    Reflection.Direction = zeros(size(Light.Origin));
+    Reflection.Origin = zeros(size(Light.Origin));
 
     for raynum = 1:numel(Light.Origin)/3
         if Surface.Bottle.inShape(Light.Origin)
             possiblelightrays = find(Surface.Normal*Light.Direction(raynum,:)'~=0);
+            Surface.Normal = -Surface.Normal;
+            n2 = 1;
+            n1 = 1.33;
         else 
             possiblelightrays = find(Surface.Normal*Light.Direction(raynum,:)'~=0);
+            n1 = 1;
+            n2 = 1.33;
         end
         for i = possiblelightrays'
             rs = Light.Origin(raynum,:)' - Surface.Vertices(Surface.BoundaryFacets(i,1),:)'; % right hand side of equation
@@ -74,16 +76,23 @@ function [ Refraction ] = RayTrace( Surface , Light , varargin)
                 plot3(G,[Light.Origin(raynum,1), Light.Origin(raynum,1)+Contact.Ray_t(raynum)*Light.Direction(raynum,1)],...
                         [Light.Origin(raynum,2), Light.Origin(raynum,2)+Contact.Ray_t(raynum)*Light.Direction(raynum,2)],...
                         [Light.Origin(raynum,3), Light.Origin(raynum,3)+Contact.Ray_t(raynum)*Light.Direction(raynum,3)], 'r-')
-                
             end
-            nAir = 1;
-            nWater = 1.33;
-            Refraction.Origin = Contact.Vertex;
-            Refraction.Direction(raynum,:) = refractLight(Surface.Normal(Contact.Facet(raynum),:), Light.Direction(raynum,:), nAir, nWater);
-    %         Reflection.Direction = reflectLight(Contact, Light, nAir, nWater);
+            
+            
+            Refraction.Origin(raynum,:) = Contact.Vertex(raynum,:);
+            Refraction.Direction(raynum,:) = refractLight(Surface.Normal(Contact.Facet(raynum),:), Light.Direction(raynum,:), n1, n2);
+            Refraction.Direction(raynum,:) = Refraction.Direction(raynum,:)/norm(Refraction.Direction(raynum,:),2);
+            
+            Reflection.Origin(raynum,:) = Contact.Vertex(raynum,:);
+            Reflection.Direction(raynum,:) = reflectLight(Surface.Normal(Contact.Facet(raynum),:), Light.Direction(raynum,:));
+            Reflection.Direction(raynum,:) = Reflection.Direction(raynum,:)/norm(Reflection.Direction(raynum,:),2);
         end
     end
+    
     Refraction.Direction = Refraction.Direction(Contact.Mask,:);
     Refraction.Origin = Refraction.Origin(Contact.Mask,:);
+    
+    Reflection.Direction = Reflection.Direction(Contact.Mask,:);
+    Reflection.Origin = Reflection.Origin(Contact.Mask,:);
 end
 
