@@ -32,13 +32,14 @@ function [ Refraction, Reflection ] = RayTrace( Surface , Light , varargin)
     Reflection.Origin = zeros(size(Light.Origin));
 
     for raynum = 1:numel(Light.Origin)/3
-        if Surface.Bottle.inShape(Light.Origin)
-            possiblelightrays = find(Surface.Normal*Light.Direction(raynum,:)'~=0);
-            Surface.Normal = -Surface.Normal;
+        if Surface.Bottle.inShape(Light.Origin(raynum,:))
+            Normal = -Surface.Normal;
+            possiblelightrays = find(Normal*Light.Direction(raynum,:)'~=0);
             n2 = 1;
             n1 = 1.33;
-        else 
-            possiblelightrays = find(Surface.Normal*Light.Direction(raynum,:)'~=0);
+        else
+            Normal = Surface.Normal;
+            possiblelightrays = find(Normal*Light.Direction(raynum,:)'~=0);
             n1 = 1;
             n2 = 1.33;
         end
@@ -78,14 +79,11 @@ function [ Refraction, Reflection ] = RayTrace( Surface , Light , varargin)
                         [Light.Origin(raynum,3), Light.Origin(raynum,3)+Contact.Ray_t(raynum)*Light.Direction(raynum,3)], 'r-')
             end
             
-            
             Refraction.Origin(raynum,:) = Contact.Vertex(raynum,:);
-            Refraction.Direction(raynum,:) = refractLight(Surface.Normal(Contact.Facet(raynum),:), Light.Direction(raynum,:), n1, n2);
-            Refraction.Direction(raynum,:) = Refraction.Direction(raynum,:)/norm(Refraction.Direction(raynum,:),2);
-            
             Reflection.Origin(raynum,:) = Contact.Vertex(raynum,:);
-            Reflection.Direction(raynum,:) = reflectLight(Surface.Normal(Contact.Facet(raynum),:), Light.Direction(raynum,:));
-            Reflection.Direction(raynum,:) = Reflection.Direction(raynum,:)/norm(Reflection.Direction(raynum,:),2);
+            
+            [Reflection.Direction(raynum,:),Refraction.Direction(raynum,:)]...
+                = snellsLaw(Normal(Contact.Facet(raynum),:), Light.Direction(raynum,:), n1, n2);
         end
     end
     
