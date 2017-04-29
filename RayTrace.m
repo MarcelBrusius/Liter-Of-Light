@@ -10,9 +10,11 @@ function [ Refraction, Reflection ] = RayTrace( Surface , Light)
 %   Fresnel's equations and Snell's Law (external function)
     
     G = gca; %get current axes
-
-    [Origin_row, Origin_col] = size(Light.Origin);
-    
+    if isstruct(Light)
+        [Origin_row, Origin_col] = size(Light.Origin);
+    else
+        pause;
+    end
     Contact.RayNumber = zeros(Origin_row,1);
     Contact.Vertex = zeros(Origin_row, Origin_col);
     Contact.BoundaryFacet = zeros(Origin_row, Origin_col);
@@ -27,8 +29,9 @@ function [ Refraction, Reflection ] = RayTrace( Surface , Light)
     Reflection.Origin = zeros(size(Light.Origin));
 
     for raynum = 1:numel(Light.Origin)/3
-        possiblelightrays = find(Surface.Normal*Light.Direction(raynum,:)'~=0);
-        for i = possiblelightrays'
+%         possiblelightrays = find(Surface.Normal*Light.Direction(raynum,:)'~=0);
+%         for i = possiblelightrays'
+        for i = 1:numel(numel(Surface.Normal)/3)
             rs = Light.Origin(raynum,:)' - Surface.Vertices(Surface.BoundaryFacets(i,1),:)'; % right hand side of equation
             sysmat = [-Light.Direction(raynum,:)', ...
                 Surface.Vertices(Surface.BoundaryFacets(i,2),:)'-Surface.Vertices(Surface.BoundaryFacets(i,1),:)',...
@@ -54,13 +57,13 @@ function [ Refraction, Reflection ] = RayTrace( Surface , Light)
             Contact.Vertex(raynum,:) = Light.Origin(raynum,:) + Contact.Ray_t(raynum)*Light.Direction(raynum,:);
             Contact.BoundaryFacets(raynum,:) = Surface.BoundaryFacets(i,:);
             Contact.Mask(raynum) = true;
-            plot3(G,Contact.Vertex(raynum,1), Contact.Vertex(raynum,2), Contact.Vertex(raynum,3), 'r*')
-            hold on
+%             plot3(G,Contact.Vertex(raynum,1), Contact.Vertex(raynum,2), Contact.Vertex(raynum,3), 'r*')
+%             hold on
 %           plot3(G,Light.Origin(raynum,1),Light.Origin(raynum,2),Light.Origin(raynum,3),'bx');
-            hold on
-            plot3(G,[Light.Origin(raynum,1), Contact.Vertex(raynum,1)],...
-                    [Light.Origin(raynum,2), Contact.Vertex(raynum,2)],...
-                    [Light.Origin(raynum,3), Contact.Vertex(raynum,3)], 'r-')
+%             hold on
+%             plot3(G,[Light.Origin(raynum,1), Contact.Vertex(raynum,1)],...
+%                     [Light.Origin(raynum,2), Contact.Vertex(raynum,2)],...
+%                     [Light.Origin(raynum,3), Contact.Vertex(raynum,3)], 'r-')
             
             Refraction.Origin(raynum,:) = Contact.Vertex(raynum,:);
             Reflection.Origin(raynum,:) = Contact.Vertex(raynum,:);

@@ -40,7 +40,7 @@ function [ Surface ] = createSurface(vert)
     for i = 1:sum(x)
         no(i) =norm(sur(i,[1,2]));
     end
-    mi = min(no);
+%     mi = min(no);
     ma = max(no);
 
     Pl = zeros([size(X),3]);
