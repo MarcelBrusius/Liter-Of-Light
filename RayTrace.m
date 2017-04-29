@@ -22,12 +22,12 @@ function [ Refraction, Reflection ] = RayTrace( Surface , Light)
     Contact.Mask = false(Origin_row,1);
     Contact.Facet = zeros(Origin_row,1);
     
-    Refraction.Direction = zeros(size(Light.Origin));
-    Refraction.Origin = zeros(size(Light.Origin));
+    Refraction.Direction = zeros(Origin_row, Origin_col);
+    Refraction.Origin = zeros(Origin_row, Origin_col);
     
-    Reflection.Direction = zeros(size(Light.Origin));
-    Reflection.Origin = zeros(size(Light.Origin));
-
+    Reflection.Direction = zeros(Origin_row, Origin_col);
+    Reflection.Origin = zeros(Origin_row, Origin_col);
+    
     for raynum = 1:numel(Light.Origin)/3
 %         possiblelightrays = find(Surface.Normal*Light.Direction(raynum,:)'~=0);
 %         for i = possiblelightrays'
@@ -81,5 +81,6 @@ function [ Refraction, Reflection ] = RayTrace( Surface , Light)
     
     Reflection.Direction = Reflection.Direction(Contact.Mask,:);
     Reflection.Origin = Reflection.Origin(Contact.Mask,:);
+
 end
 
