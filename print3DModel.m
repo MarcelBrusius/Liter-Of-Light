@@ -13,16 +13,22 @@ F = figure(1);
 G = gca;
 hold on
 
+struct(init)
+
 Surface = createSurface(vert);
 
 % new struct for light rays:
 x = [0 0.5 1.25];
-Origin = 5*(2*rand(1000,3)-1)+80*x/norm(x);
+Origin = 5*(2*rand(100,3)-1)+80*x/norm(x);
 % Origin = 5*(2*x/norm(x)-1)+80*x/norm(x);
 Direction = [0 -.75 -1];
 Light = createLight(Direction,Origin);
 
-[Refract,Reflect] = RayTrace(Surface,Light);
+[R,T] = RayTrace(Surface,Light);
+
+init.Origin = R.Origin;
+init.Direction = Light.Direction;
+printRays(init,-30,'y-');
 
 height = 10;
 
@@ -30,9 +36,6 @@ height = 10;
 % Ind(Ind>(2^(height)-1)) = 0;
 
 % C = cell(2^(height)-1,2);
-T = Reflect;
-R = Refract;
-clear('Refract','Reflect');
 
 above_roof = 40;
 

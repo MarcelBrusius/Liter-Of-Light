@@ -31,7 +31,7 @@ function [ Refraction, Reflection ] = RayTrace( Surface , Light)
     for raynum = 1:numel(Light.Origin)/3
 %         possiblelightrays = find(Surface.Normal*Light.Direction(raynum,:)'~=0);
 %         for i = possiblelightrays'
-        for i = 1:numel(numel(Surface.Normal)/3)
+        for i = 1:numel(Surface.Normal)/3
             rs = Light.Origin(raynum,:)' - Surface.Vertices(Surface.BoundaryFacets(i,1),:)'; % right hand side of equation
             sysmat = [-Light.Direction(raynum,:)', ...
                 Surface.Vertices(Surface.BoundaryFacets(i,2),:)'-Surface.Vertices(Surface.BoundaryFacets(i,1),:)',...
@@ -57,7 +57,7 @@ function [ Refraction, Reflection ] = RayTrace( Surface , Light)
             Contact.Vertex(raynum,:) = Light.Origin(raynum,:) + Contact.Ray_t(raynum)*Light.Direction(raynum,:);
             Contact.BoundaryFacets(raynum,:) = Surface.BoundaryFacets(i,:);
             Contact.Mask(raynum) = true;
-%             plot3(G,Contact.Vertex(raynum,1), Contact.Vertex(raynum,2), Contact.Vertex(raynum,3), 'r*')
+            plot3(G,Contact.Vertex(raynum,1), Contact.Vertex(raynum,2), Contact.Vertex(raynum,3), 'r*')
 %             hold on
 %           plot3(G,Light.Origin(raynum,1),Light.Origin(raynum,2),Light.Origin(raynum,3),'bx');
 %             hold on
