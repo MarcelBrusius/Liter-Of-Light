@@ -16,7 +16,7 @@ function [ Surface ] = createSurface(vert)
 %   Surface.BoundaryFacets: contains the boundary facets defining the
 %                           surface
 
-    G = gca; %get current axes
+   
 
     % create struct for better overview:
     Surface = struct;
@@ -67,6 +67,7 @@ function [ Surface ] = createSurface(vert)
 
     % Plot the bottle:
     plot(Surface.Bottle,'FaceAlpha',0.2,'FaceLighting','gouraud','BackFaceLighting','unlit');
+    G = gca; %get current axes
     % trisurf(k,vert(:,1),vert(:,2),vert(:,3));
 %     axis square
     % alpha(0.3)
@@ -83,6 +84,14 @@ function [ Surface ] = createSurface(vert)
         Surface.Normal(i,:) = cross(Surface.Vertices(Surface.BoundaryFacets(i,2),:)-Surface.Vertices(Surface.BoundaryFacets(i,1),:),...
                                     Surface.Vertices(Surface.BoundaryFacets(i,3),:)-Surface.Vertices(Surface.BoundaryFacets(i,1),:));
         Surface.Normal(i,:) = Surface.Normal(i,:)/norm(Surface.Normal(i,:));
+%         MidPoint = Surface.Vertices(Surface.BoundaryFacets(i,1),:) + ...
+%                    0.5*(Surface.Vertices(Surface.BoundaryFacets(i,2),:) ...
+%                    - Surface.Vertices(Surface.BoundaryFacets(i,1),:)) + ...
+%                    0.5*(Surface.Vertices(Surface.BoundaryFacets(i,3),:) ...
+%                    - Surface.Vertices(Surface.BoundaryFacets(i,1),:));
+%         plot3(G,[MidPoint(1) + Surface.Normal(i,1), MidPoint(1)],...
+%                 [MidPoint(2) + Surface.Normal(i,2), MidPoint(2)],...
+%                 [MidPoint(3) + Surface.Normal(i,3), MidPoint(3)],'r-');
     end
 end
 
