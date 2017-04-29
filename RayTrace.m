@@ -29,9 +29,13 @@ function [ Refraction, Reflection ] = RayTrace( Surface , Light)
     Reflection.Origin = zeros(Origin_row, Origin_col);
     
     for raynum = 1:numel(Light.Origin)/3
-%         possiblelightrays = find(Surface.Normal*Light.Direction(raynum,:)'~=0);
-%         for i = possiblelightrays'
-        for i = 1:numel(Surface.Normal)/3
+        if norm(Light.Origin(raynum,:) - Surface.Bottle.Points(Surface.Bottle.nearestNeighbor(Light.Origin(raynum,:)),:),2) < 0.5
+            possiblelightrays = find(Surface.Normal*Light.Direction(raynum,:)'>0);
+        else
+            possiblelightrays = find(Surface.Normal*Light.Direction(raynum,:)'<0);
+        end
+        for i = possiblelightrays'
+%         for i = 1:numel(Surface.Normal)/3
             rs = Light.Origin(raynum,:)' - Surface.Vertices(Surface.BoundaryFacets(i,1),:)'; % right hand side of equation
             sysmat = [-Light.Direction(raynum,:)', ...
                 Surface.Vertices(Surface.BoundaryFacets(i,2),:)'-Surface.Vertices(Surface.BoundaryFacets(i,1),:)',...
