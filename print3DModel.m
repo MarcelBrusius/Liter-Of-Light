@@ -22,15 +22,19 @@ Origin = 5*(2*x/norm(x)-1)+80*x/norm(x);
 Direction = [0 -.75 -1];
 Light = createLight(Direction,Origin);
 
-[Refract, Reflect] = RayTrace(Surface,Light,1);
-
-[T1,R1] = RayTrace(Surface,Refract,1);
-[T2,R2] = RayTrace(Surface,T1,1);
-[T3,R3] = RayTrace(Surface,R2,1);
-% [T4,R4] = RayTrace(Surface,R3,1)
-% [~,R] = RayTrace(Surface,R,1);
-% [~,R] = RayTrace(Surface,R,1);
-% [~,R] = RayTrace(Surface,R,1);
+[Refract, Reflect] = RayTrace(Surface,Light);
+printRays(Reflect,20,'g-');
+[T1,R1] = RayTrace(Surface,Refract);
+printRays(R1,20,'b-');
+[T2,R2] = RayTrace(Surface,T1);
+% printRays(T2,20);
+[T3,R3] = RayTrace(Surface,R2);
+% printRays(R3,20);
+% printRays(T3,20);
+% [T4,R4] = RayTrace(Surface,R3)
+% [~,R] = RayTrace(Surface,R);
+% [~,R] = RayTrace(Surface,R);
+% [~,R] = RayTrace(Surface,R);
 % 
 % height = 5;
 % 
@@ -41,10 +45,10 @@ Light = createLight(Direction,Origin);
 % C{1} = [Refract,Reflect];
 % 
 % for i = 2:2:2^(height)-1
-%     [T,R] = RayTrace(Surface,C{floor(i/2)}(1),1);
+%     [T,R] = RayTrace(Surface,C{floor(i/2)}(1));
 %     C{ i } = [T,R];
 %     
-%     [T,R] = RayTrace(Surface,C{floor(i/2)}(2),1);
+%     [T,R] = RayTrace(Surface,C{floor(i/2)}(2));
 %     C{i+1} = [T,R];
 % end
 % 
