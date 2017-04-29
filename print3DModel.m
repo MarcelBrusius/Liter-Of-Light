@@ -21,8 +21,8 @@ clear('vert');
 
 % new struct for light rays:
 x = [0 0.5 1.25];
-% Origin = 20*(2*rand(10,3)-1)+100*x/norm(x);
-Origin = 5*(2*x/norm(x)-1)+100*x/norm(x);
+Origin = 20*(2*rand(1000,3)-1)+90*x/norm(x);
+% Origin = 5*(2*x/norm(x)-1)+100*x/norm(x);
 Direction = [0 -.75 -1];
 Light = createLight(Direction,Origin);
 
