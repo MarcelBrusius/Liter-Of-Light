@@ -43,7 +43,7 @@ function [ Refraction, Reflection ] = RayTrace( Surface , Light)
                     Contact.Ray_t(raynum) = t;
                     Contact.Facet(raynum) = i;
                     Contact.RayNumber(i) = raynum;
-                elseif (Contact.Ray_t(raynum) > t)
+                elseif (Contact.Ray_t(raynum) > t & t > 10^-7)
                     Contact.Ray_t(raynum) = t;
                     Contact.Facet(raynum) = i;
                     Contact.RayNumber(i) = raynum;

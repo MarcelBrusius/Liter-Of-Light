@@ -9,8 +9,6 @@ function [ Reflection, Refraction ] = snellsLaw( Normal, Direction, n1, n2 )
 %
 %   http://www.thefullwiki.org/Snells_law
 
-% Reflection = Direction - 2*dot(Normal,Direction)/(norm(Normal,2)^2)*Normal;
-
 cos_theta_1 = dot(Normal, -Direction);
 cos_theta_2 = sqrt(1-(n1/n2)^2*(1-cos_theta_1^2));
 
