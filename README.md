@@ -9,6 +9,8 @@ During daytime this design performs like a light bulb and delivers light equival
 + Is it really 40-60 watt, how deep do we have to mount the bottle into the roof and which role does the shape of the bottle play? 
 + Is it even possible to compute an ideal shape for the bottle? 
 
+***
+
 ## Roadmap:
 ### Finished:
 + Create 3D model of a bottle (surface)
