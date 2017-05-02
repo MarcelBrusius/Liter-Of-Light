@@ -28,6 +28,8 @@ Light = createLight(Direction,Origin);
 
 [R,T] = RayTrace(Surface,Light);
 above_roof = 45;
+
+% ignore rays that are above the "imaginary roof"
 R.Direction = R.Direction(R.Origin(:,3)>above_roof,:);
 T.Direction = T.Direction(T.Origin(:,3)>above_roof,:);
 
@@ -38,7 +40,9 @@ init.Origin = R.Origin;
 init.Direction = Light.Direction(R.Origin(:,3)>above_roof,:);
 printRays(init,-20,'y-');
 
-height = 10;
+
+
+height = 10; % number of iterations of refraction/reflection
 
 % Ind = [2*(1:(2^(height-1)-1))', 2*(1:(2^(height-1)-1))'+1];
 % Ind(Ind>(2^(height)-1)) = 0;
@@ -46,6 +50,7 @@ height = 10;
 % C = cell(2^(height)-1,2);
 
 
+% nice visualization of progess
 h = waitbar(0,['Calculating...', num2str(0), '%']);
 
 for i = 2:height
@@ -61,8 +66,11 @@ for i = 2:height
 end
 close(h)
 
+% forces 3D view
 view(3)
 
+
+% resizes the output windows
 G.ZLim = [-20, 80];
 G.XLim = [-25, 25];
 G.YLim = [-25, 25];
