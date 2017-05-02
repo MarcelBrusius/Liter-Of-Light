@@ -22,3 +22,5 @@ During daytime this design performs like a light bulb and delivers light equival
 ### Future:
 + Model light intesity for incoming rays
 + Compute light intensity for outgoing rays
++ Further optimization
++ Using other representations of the surface, e.g. NURBs
