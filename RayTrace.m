@@ -29,7 +29,7 @@ function [ Refraction, Reflection ] = RayTrace( Surface , Light)
     Reflection.Origin = zeros(Origin_row, Origin_col);
     
     for raynum = 1:numel(Light.Origin)/3
-        if norm(Light.Origin(raynum,:) - Surface.Bottle.Points(Surface.Bottle.nearestNeighbor(Light.Origin(raynum,:)),:),2) < 1
+        if norm(Light.Origin(raynum,:) - Surface.Bottle.Points(Surface.Bottle.nearestNeighbor(Light.Origin(raynum,:)),:),2) < 4.5
             possiblelightrays = find(Surface.Normal*Light.Direction(raynum,:)'>0);
         else
             possiblelightrays = find(Surface.Normal*Light.Direction(raynum,:)'<0);
@@ -50,7 +50,7 @@ function [ Refraction, Reflection ] = RayTrace( Surface , Light)
                     Contact.Ray_t(raynum) = t;
                     Contact.Facet(raynum) = i;
                     Contact.RayNumber(i) = raynum;
-                elseif (Contact.Ray_t(raynum) > t & t > 10^-7)
+                elseif (Contact.Ray_t(raynum) > t && t > 10^-7)
                     Contact.Ray_t(raynum) = t;
                     Contact.Facet(raynum) = i;
                     Contact.RayNumber(i) = raynum;
