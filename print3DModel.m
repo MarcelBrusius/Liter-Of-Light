@@ -70,7 +70,7 @@ for i = 2:height
     T.Direction = T.Direction(T.Origin(:,3)<above_roof,:);
     T.Origin = T.Origin(T.Origin(:,3)<above_roof,:);
     T.Intensity = T.Intensity(T.Origin(:,3)<above_roof,:);
-    disp(length(T.Origin))
+%   disp(length(T.Origin))
     printRays(T,20,'b-');
 %     C{i,2} = R;
     waitbar(i/height,h,['Calculating...', num2str(100*i/height), '%']);
