@@ -70,13 +70,8 @@ for i = 2:height
     T.Direction = T.Direction(T.Origin(:,3)<above_roof,:);
     T.Origin = T.Origin(T.Origin(:,3)<above_roof,:);
     T.Intensity = T.Intensity(T.Origin(:,3)<above_roof,:);
-<<<<<<< HEAD
     %disp(length(T.Origin))
     printRays(T,10,'b-');
-=======
-%   disp(length(T.Origin))
-    printRays(T,20,'b-');
->>>>>>> 169df48fcdd37484f9811e5d46e2782e7b789baf
 %     C{i,2} = R;
     waitbar(i/height,h,['Calculating...', num2str(100*i/height), '%']);
     BottleIntensity=BottleIntensity + sum(T.Intensity);
