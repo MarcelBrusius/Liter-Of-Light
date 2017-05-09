@@ -21,9 +21,13 @@ clear('vert');
 
 % new struct for light rays:
 x = [0 0.5 1.25];
-Origin = 20*(2*rand(1000,3)-1)+90*x/norm(x);
-% Origin = 5*(2*x/norm(x)-1)+100*x/norm(x);
+seed=50;
+rng(seed);
 Direction = [0 -.75 -1];
+%Origin=[16*rand(50,2)-8,repmat(45,[50,1])]-20*Direction;
+Origin = 20*(2*rand(100,3)-1)+90*x/norm(x);
+% Origin = 5*(2*x/norm(x)-1)+100*x/norm(x);
+
 Light = createLight(Direction,Origin);
 
 [R,T] = RayTrace(Surface,Light);
@@ -33,8 +37,12 @@ above_roof = 45;
 R.Direction = R.Direction(R.Origin(:,3)>above_roof,:);
 T.Direction = T.Direction(T.Origin(:,3)>above_roof,:);
 
+R.Intensity=R.Intensity(R.Origin(:,3)>above_roof,:);
+T.Intensity=T.Intensity(T.Origin(:,3)>above_roof,:);
+
 R.Origin = R.Origin(R.Origin(:,3)>above_roof,:);
 T.Origin = T.Origin(T.Origin(:,3)>above_roof,:);
+
 
 init.Origin = R.Origin;
 init.Direction = Light.Direction(R.Origin(:,3)>above_roof,:);
@@ -53,16 +61,20 @@ height = 10; % number of iterations of refraction/reflection
 % nice visualization of progess
 h = waitbar(0,['Calculating...', num2str(0), '%']);
 
+BottleIntensity=0;
 for i = 2:height
-    [T,R] = RayTrace(Surface,R);
+        [T,R] = RayTrace(Surface,R);
 %     C{floor(i/2)
 %     C{i,1} = T;
     % print rays, and ignore those originating under the "roof" (threshold):
     T.Direction = T.Direction(T.Origin(:,3)<above_roof,:);
     T.Origin = T.Origin(T.Origin(:,3)<above_roof,:);
+    T.Intensity = T.Intensity(T.Origin(:,3)<above_roof,:);
+    disp(length(T.Origin))
     printRays(T,20,'b-');
 %     C{i,2} = R;
     waitbar(i/height,h,['Calculating...', num2str(100*i/height), '%']);
+    BottleIntensity=BottleIntensity + sum(T.Intensity);
 end
 close(h)
 

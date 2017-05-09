@@ -1,4 +1,4 @@
-function [ Refraction, Reflection ] = RayTrace( Surface , Light)
+function [Refraction,Reflection] = RayTrace( Surface , Light)
 %RAYTRACE Computes ray tracing for light rays
 %   Computes intersection of light rays given in Light.Origin with
 %   direction Light.Direction onto a triangular surface given in Surface
@@ -42,9 +42,11 @@ function [ Refraction, Reflection ] = RayTrace( Surface , Light)
     
     Refraction.Direction = zeros(Origin_row, Origin_col);
     Refraction.Origin = zeros(Origin_row, Origin_col);
+    Refraction.Intensity = zeros(Origin_row, 1);
     
     Reflection.Direction = zeros(Origin_row, Origin_col);
     Reflection.Origin = zeros(Origin_row, Origin_col);
+    Reflection.Intensity = zeros(Origin_row, 1);
     
     for raynum = 1:numel(Light.Origin)/3
         
@@ -52,7 +54,7 @@ function [ Refraction, Reflection ] = RayTrace( Surface , Light)
         % is currently observed
         %
         % NOTE: may be unstable!
-        if norm(Light.Origin(raynum,:) - Surface.Bottle.Points(Surface.Bottle.nearestNeighbor(Light.Origin(raynum,:)),:),2) < 1
+        if norm(Light.Origin(raynum,:) - Surface.Bottle.Points(Surface.Bottle.nearestNeighbor(Light.Origin(raynum,:)),:),2) < 4.5
             possiblelightrays = find(Surface.Normal*Light.Direction(raynum,:)'>0);
         else
             possiblelightrays = find(Surface.Normal*Light.Direction(raynum,:)'<0);
@@ -93,7 +95,7 @@ function [ Refraction, Reflection ] = RayTrace( Surface , Light)
                     Contact.RayNumber(i) = raynum; % (1) 
                 % just check if a closer intersection point has been found
                 % and ignore some numerical error:
-                elseif (Contact.Ray_t(raynum) > t & t > 10^-7)
+                elseif (Contact.Ray_t(raynum) > t && t > 10^-7)
                     Contact.Ray_t(raynum) = t;
                     Contact.Facet(raynum) = i;
                     Contact.RayNumber(i) = raynum; % (2)
@@ -123,12 +125,17 @@ function [ Refraction, Reflection ] = RayTrace( Surface , Light)
             Reflection.Origin(raynum,:) = Contact.Vertex(raynum,:);
             
             % compute new ray directions using Snell's Law
-            if Surface.Bottle.inShape(Light.Origin(raynum,:))
-                [Reflection.Direction(raynum,:),Refraction.Direction(raynum,:)]...
-                = snellsLaw(-Surface.Normal(Contact.Facet(raynum),:), Light.Direction(raynum,:), 1.33, 1);
+            %if Surface.Bottle.inShape(Light.Origin(raynum,:))
+            if norm(Light.Origin(raynum,:) - Surface.Bottle.Points(Surface.Bottle.nearestNeighbor(Light.Origin(raynum,:)),:),2) < 4.5
+                [Reflection.Direction(raynum,:),Refraction.Direction(raynum,:),...
+                Reflection.Intensity(raynum,:),Refraction.Intensity(raynum,:)]...
+                = snellsLaw(-Surface.Normal(Contact.Facet(raynum),:), Light.Direction(raynum,:),...
+                  Light.Intensity(raynum,:), 1.33, 1);
             else
-                [Reflection.Direction(raynum,:),Refraction.Direction(raynum,:)]...
-                = snellsLaw(Surface.Normal(Contact.Facet(raynum),:), Light.Direction(raynum,:), 1, 1.33);
+                [Reflection.Direction(raynum,:),Refraction.Direction(raynum,:),...
+                Reflection.Intensity(raynum,:),Refraction.Intensity(raynum,:)]...
+                = snellsLaw(Surface.Normal(Contact.Facet(raynum),:), Light.Direction(raynum,:),...
+                Light.Intensity(raynum,:), 1, 1.33);
             end
         end
     end
@@ -137,9 +144,11 @@ function [ Refraction, Reflection ] = RayTrace( Surface , Light)
     % (may be irrelevant, but not sure):
     Refraction.Direction = Refraction.Direction(Contact.Mask,:);
     Refraction.Origin = Refraction.Origin(Contact.Mask,:);
+    Refraction.Intensity = Refraction.Intensity(Contact.Mask,:);
     
     Reflection.Direction = Reflection.Direction(Contact.Mask,:);
     Reflection.Origin = Reflection.Origin(Contact.Mask,:);
+    Reflection.Intensity = Reflection.Intensity(Contact.Mask,:);
 
 end
 
