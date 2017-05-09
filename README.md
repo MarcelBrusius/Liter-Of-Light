@@ -19,6 +19,7 @@ During daytime this design performs like a light bulb and delivers light equival
 ### In progress:
 + Compute refraction and reflection direction on surface
 + Model outgoing light rays
++ Bug fixing
 + Optimize performance
 
 ### Future:
@@ -28,4 +29,5 @@ During daytime this design performs like a light bulb and delivers light equival
     + Model other shapes
     + Generalize computations
     + Optimize shape
++ More bug fixing
 + Further optimizations
