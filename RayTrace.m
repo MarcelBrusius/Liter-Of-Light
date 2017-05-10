@@ -54,7 +54,7 @@ function [Refraction,Reflection] = RayTrace( Surface , Light)
         % is currently observed
         %
         % NOTE: may be unstable!
-        if norm(Light.Origin(raynum,:) - Surface.Bottle.Points(Surface.Bottle.nearestNeighbor(Light.Origin(raynum,:)),:),2) < 4.5
+        if norm(Light.Origin(raynum,:) - Surface.Bottle.Points(Surface.Bottle.nearestNeighbor(Light.Origin(raynum,:)),:),2) < 2.25
             possiblelightrays = find(Surface.Normal*Light.Direction(raynum,:)'>0);
         else
             possiblelightrays = find(Surface.Normal*Light.Direction(raynum,:)'<0);
@@ -126,7 +126,7 @@ function [Refraction,Reflection] = RayTrace( Surface , Light)
             
             % compute new ray directions using Snell's Law
             %if Surface.Bottle.inShape(Light.Origin(raynum,:))
-            if norm(Light.Origin(raynum,:) - Surface.Bottle.Points(Surface.Bottle.nearestNeighbor(Light.Origin(raynum,:)),:),2) < 4.5
+            if norm(Light.Origin(raynum,:) - Surface.Bottle.Points(Surface.Bottle.nearestNeighbor(Light.Origin(raynum,:)),:),2) < 2.25
                 [Reflection.Direction(raynum,:),Refraction.Direction(raynum,:),...
                 Reflection.Intensity(raynum,:),Refraction.Intensity(raynum,:)]...
                 = snellsLaw(-Surface.Normal(Contact.Facet(raynum),:), Light.Direction(raynum,:),...

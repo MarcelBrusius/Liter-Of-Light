@@ -6,7 +6,16 @@ tic
 
 % save('Bottle2.mat',vert)
 loaded = load('Bottle.mat');
-vert = loaded.vert;
+vert = 0.5*loaded.vert;
+
+above_roof = 18;
+%elevation angle,i.e. incidence angle w.r.t. the horizontal
+IncidenceAngle=45;
+%number of sun rays
+n_rays=100;
+
+[Origin,Direction,Intensity] = chooseRays(above_roof, IncidenceAngle, n_rays);
+Direction=Direction/norm(Direction);
 
 F = figure(1);
 
@@ -19,19 +28,10 @@ Surface = createSurface(vert);
 
 clear('vert');
 
-% new struct for light rays:
-x = [0 0.5 1.25];
-seed=50;
-rng(seed);
-Direction = [0 -.75 -1];
-%Origin=[16*rand(50,2)-8,repmat(45,[50,1])]-20*Direction;
-Origin = 20*(2*rand(100,3)-1)+90*x/norm(x);
-% Origin = 5*(2*x/norm(x)-1)+100*x/norm(x);
-
 Light = createLight(Direction,Origin);
+Light.Intensity=repmat(Intensity,[n_rays,1]);
 
 [R,T] = RayTrace(Surface,Light);
-above_roof = 45;
 
 % ignore rays that are above the "imaginary roof"
 R.Direction = R.Direction(R.Origin(:,3)>above_roof,:);
@@ -46,7 +46,7 @@ T.Origin = T.Origin(T.Origin(:,3)>above_roof,:);
 
 init.Origin = R.Origin;
 init.Direction = Light.Direction(R.Origin(:,3)>above_roof,:);
-printRays(init,-20,'y-');
+printRays(init,-10,'y-');
 
 
 
@@ -70,8 +70,8 @@ for i = 2:height
     T.Direction = T.Direction(T.Origin(:,3)<above_roof,:);
     T.Origin = T.Origin(T.Origin(:,3)<above_roof,:);
     T.Intensity = T.Intensity(T.Origin(:,3)<above_roof,:);
-    disp(length(T.Origin))
-    printRays(T,20,'b-');
+    %disp(length(T.Origin))
+    printRays(T,10,'b-');
 %     C{i,2} = R;
     waitbar(i/height,h,['Calculating...', num2str(100*i/height), '%']);
     BottleIntensity=BottleIntensity + sum(T.Intensity);
@@ -83,9 +83,9 @@ view(3)
 
 
 % resizes the output windows
-G.ZLim = [-20, 80];
-G.XLim = [-25, 25];
-G.YLim = [-25, 25];
+G.ZLim = [-10, 40];
+G.XLim = [-15, 15];
+G.YLim = [-15, 15];
 
 view(3);
 toc
