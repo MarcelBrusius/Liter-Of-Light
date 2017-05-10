@@ -12,7 +12,7 @@ above_roof = 18;
 %elevation angle,i.e. incidence angle w.r.t. the horizontal
 IncidenceAngle=80;
 %number of sun rays
-n_rays=1000;
+n_rays=500;
 
 [Origin,Direction,Intensity] = chooseRays(above_roof, IncidenceAngle, n_rays);
 Direction=Direction/norm(Direction);
@@ -32,7 +32,7 @@ Light = createLight(Direction,Origin);
 Light.Intensity=repmat(Intensity,[n_rays,1]);
 
 [R,T] = RayTrace(Surface,Light);
-disp(length(R.Direction));
+disp(length(R.Origin))
 
 % ignore rays that are above the "imaginary roof"
 R.Direction = R.Direction(R.Origin(:,3)>above_roof,:);
@@ -45,6 +45,13 @@ R.Origin = R.Origin(R.Origin(:,3)>above_roof,:);
 T.Origin = T.Origin(T.Origin(:,3)>above_roof,:);
 
 %ignore rays hitting the bottle cap
+
+R.Direction = R.Direction(R.Origin(:,3)<28.1,:);
+T.Direction = T.Direction(T.Origin(:,3)<28.1,:);
+
+R.Intensity=R.Intensity(R.Origin(:,3)<28.1,:);
+T.Intensity=T.Intensity(T.Origin(:,3)<28.1,:);
+
 R.Origin = R.Origin(R.Origin(:,3)<28.1,:);
 T.Origin = T.Origin(T.Origin(:,3)<28.1,:);
 
