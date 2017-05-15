@@ -9,24 +9,17 @@ loaded = load('Bottle.mat');
 %rescaling (to get values in cm)
 vert = 0.5*loaded.vert;
 
-%Size of inital rectangle in m^2 (where the origin points are located)
-%Depends on IncidenceAngle
-
 %Greatest diameter of bottle
 diameter=max(vert(:,2))-min(vert(:,2));
-
 f=diameter;
-e=diameter/cos((90-IncidenceAngle)*pi/180);
-area=e*f/10000;
 
 %Finding bottle points in same x1-x3-plane and ignore some numerical error
 vert=vert(vert(:,2)<-0.0078,:);
 vert=vert(vert(:,2)>-0.01,:);
 
 %Finding the bottle point in this plane which is nearest to above_roof
-vert(:,3)=abs(vert(:,3)-above_roof);
-[m,i]=min(vert(:,3));
-vert(i,3)=above_roof;
+[~,i]=min(abs(vert(:,3)-above_roof));
+%vert(i,3)=above_roof;
 bottleroof=vert(i,:);
 
 
@@ -53,6 +46,31 @@ end
 
 v=[v1 0 v3];
 v=v/(norm(v));
+
+%Size of inital rectangle in m^2 (where the origin points are located)
+%Depends on IncidenceAngle
+
+%critical angle(75 degrees) depends on bottle shape 
+
+if IncidenceAngle < 75
+    [~,I]=max(vert(:,3));
+    bottletop=vert(I,:);
+    bb=b/norm(b);
+    %orthogonal projection of bottletop to initial ray line
+    op=bottleroof+dot(bottletop-bottleroof,bb)*bb;
+    e=norm(bottletop-op);
+else
+    %e=diameter/cos((90-IncidenceAngle)*pi/180);
+    %e=11;
+    %point "behind" bottlecap
+    p=[-4.2183    0.1303   18.6124];
+    bb=b/norm(b);
+    op=bottleroof+dot(p-bottleroof,bb)*bb;
+    e=norm(p-op);
+end
+
+area=e*f/10000;
+
 rn=rand(n_rays,2);
 
 %Calculation of Origin points located in the computed rectangle

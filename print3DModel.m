@@ -8,9 +8,9 @@ tic
 loaded = load('Bottle.mat');
 vert = 0.5*loaded.vert;
 
-above_roof = 18;
+above_roof = 10;
 %elevation angle,i.e. incidence angle w.r.t. the horizontal
-IncidenceAngle=80;
+IncidenceAngle=65;
 %number of sun rays
 n_rays=500;
 
@@ -71,24 +71,25 @@ height = 10; % number of iterations of refraction/reflection
 
 
 % nice visualization of progess
-% h = waitbar(0,['Calculating...', num2str(0), '%']);
-% 
-% BottleIntensity=0;
-% for i = 2:height
-%         [T,R] = RayTrace(Surface,R);
-% %     C{floor(i/2)
-% %     C{i,1} = T;
-%     % print rays, and ignore those originating under the "roof" (threshold):
-%     T.Direction = T.Direction(T.Origin(:,3)<above_roof,:);
-%     T.Origin = T.Origin(T.Origin(:,3)<above_roof,:);
-%     T.Intensity = T.Intensity(T.Origin(:,3)<above_roof,:);
-%     %disp(length(T.Origin))
-%     printRays(T,10,'b-');
-% %     C{i,2} = R;
-%     waitbar(i/height,h,['Calculating...', num2str(100*i/height), '%']);
-%     BottleIntensity=BottleIntensity + sum(T.Intensity);
-% end
-% close(h)
+h = waitbar(0,['Calculating...', num2str(0), '%']);
+
+BottleIntensity=0;
+for i = 2:height
+        [T,R] = RayTrace(Surface,R);
+%     C{floor(i/2)
+%     C{i,1} = T;
+    % print rays, and ignore those originating under the "roof" (threshold):
+    T.Direction = T.Direction(T.Origin(:,3)<above_roof,:);
+    T.Origin = T.Origin(T.Origin(:,3)<above_roof,:);
+    T.Intensity = T.Intensity(T.Origin(:,3)<above_roof,:);
+    %disp(length(T.Origin))
+    %printRays(T,10,'b-');
+%     C{i,2} = R;
+    waitbar(i/height,h,['Calculating...', num2str(100*i/height), '%']);
+    BottleIntensity=BottleIntensity + sum(T.Intensity);
+    disp(sum(T.Intensity));
+end
+close(h)
 
 % forces 3D view
 view(3)
