@@ -25,14 +25,14 @@ if 1-(n1/n2)^2*(1-cos_theta_1^2) > 0  % check for total reflection
     Refraction = Refraction/norm(Refraction,2);
     
     %Method 1: Assume plastic doesn't change intensities
-    %{
+    %%{
     [ReflectionRate, RefractionRate]=fresnel(n1,n2,cos_theta_1,cos_theta_2);
     ReflectionIntensity= Intensity* ReflectionRate;
     RefractionIntensity= Intensity* RefractionRate;
     %}
     
     % Method 2: Calculate multiple intensity splitting due to the plastic layer
-    %%{
+    %{
     n3=1.5; % refractive index of plastic, i.e. the middle layer
     cos_theta_13 = sqrt(1-(n1/n3)^2*(1-cos_theta_1^2));
     [R13,T13]=fresnel(n1,n3,cos_theta_1,cos_theta_13);
