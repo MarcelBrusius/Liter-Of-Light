@@ -4,8 +4,8 @@
 loaded = load('Bottle.mat');
 vert = 0.5*loaded.vert;
 
-above_roof=18;
-IncidenceAngle=65;
+above_roof=16;
+IncidenceAngle=81;
 %
 diameter=max(vert(:,2))-min(vert(:,2));
 f=diameter;
@@ -16,58 +16,41 @@ hold on
 init = struct;
 Surface = createSurface(vert);
 %
-vert=vert(vert(:,2)<0.1,:);
-vert=vert(vert(:,2)>-0.1,:);
-
-[~,i]=min(abs(vert(:,3)-above_roof));
+vert2=vert(vert(:,2)<0.1,:);
+vert2=vert2(vert2(:,2)>-0.1,:);
+vert2=vert2(vert2(:,3)<= above_roof,:);
+[~,i]=min(abs(vert2(:,3)-above_roof));
 %vert(i,3)=above_roof;
-bottleroof=vert(i,:);
+bottleroof=vert2(i,:);
 
 
 %
-b3=25;
-if cos(IncidenceAngle*pi/180) > 0
+
+if IncidenceAngle > 0
+    b3=25;
     b1=abs(cos(IncidenceAngle*pi/180))*b3/(sqrt(1-(cos(IncidenceAngle*pi/180))^2));
-else
-    b1=0;
-end
-b=[b1 0 b3];
-%
-v3=10;
-if b1 > 0
+    v3=10;
     v1=-v3*b3/b1;
 else
+    b1=1;
+    b3=0;
+    v1=0;
+    v3=1;
 end
-
+b=[b1 0 b3];
 v=[v1 0 v3];
 v=v/(norm(v));
 
-if IncidenceAngle < 75
-    [~,I]=max(vert(:,3));
-    bottletop=vert(I,:);
-    bb=b/norm(b);
-    op=bottleroof+dot(bottletop-bottleroof,bb)*bb;
-    e=norm(bottletop-op);
-else
-    %e=diameter/cos((90-IncidenceAngle)*pi/180);
-%     vert=vert(vert(:,1)<0,:);
-%     vert=vert(vert(:,3)>= above_roof,:);
-%     bb=b/norm(b);
-%     d=zeros(length(vert),1);
-%     for k=1:length(vert)
-%        d(k,1)=norm(bottleroof+dot(vert(k,:)-bottleroof,bb)*bb-vert(k,:));
-%     end
-    %e=max(d(:,1));
-    
-    %point "behind" bottlecap
-    p=[-4.2183    0.1303   18.6124];
-    bb=b/norm(b);
-    op=bottleroof+dot(p-bottleroof,bb)*bb;
-    e=norm(p-op);
-    
-    %e=11;
-end
-
+vert=vert(vert(:,1)<0,:);
+vert=vert(vert(:,3)>= above_roof,:);
+%distance plane origin 
+d=dot(bottleroof,-v);
+distances=zeros(length(vert),1);
+    for k=1:length(vert)
+       distances(k,1)=abs(dot(vert(k,:),-v)-d);
+    end
+[e,I]=max(distances(:,1));
+maxpoint=vert(I,:);
 
 area=e*f/10000;
 
@@ -111,15 +94,11 @@ plot3(G,[rec3(1,1),rec2(1,1)],[rec3(1,2),rec2(1,2)],[rec3(1,3),rec2(1,3)],'b-');
 
 recm1= m + 1*e*v;
 G=gca;
-if IncidenceAngle < 75
-    plot3(G,[recm1(1,1),bottletop(1,1)],[recm1(1,2),bottletop(1,2)],[recm1(1,3),bottletop(1,3)],'r-');
-else
-    plot3(G,[recm1(1,1),p(1,1)],[recm1(1,2),p(1,2)],[recm1(1,3),p(1,3)],'r-');
-end
+plot3(G,[recm1(1,1),maxpoint(1,1)],[recm1(1,2),maxpoint(1,2)],[recm1(1,3),maxpoint(1,3)],'r-');
 view(3);
 
 G.ZLim = [-10, 60];
-G.XLim = [-30, 30];
+G.XLim = [-30, 45];
 G.YLim = [-30, 30];
 
 view(3);
