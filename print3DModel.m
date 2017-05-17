@@ -112,8 +112,8 @@ disp(['Resulting intensity: ', num2str(BottleIntensity)]);
 disp(['Efficiency:          ', num2str(BottleIntensity/sum(Light.Intensity))]);
 
 % Print results only if requested ( print == 1 ):
-print = 1;
-if print
+printresults = 1;
+if printresults
     for i = 2:height
         printRays(C(i),10,'b-');
     end
