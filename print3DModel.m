@@ -112,8 +112,9 @@ disp(['Resulting intensity: ', num2str(BottleIntensity)]);
 disp(['Efficiency:          ', num2str(BottleIntensity/sum(Light.Intensity))]);
 
 % Print results only if requested ( print == 1 ):
-printresults = 1;
+printresults = 0;
 if printresults
+    plot(Surface.Bottle,'FaceAlpha',0.2,'FaceLighting','gouraud','BackFaceLighting','unlit');
     for i = 2:height
         printRays(C(i),10,'b-');
     end
