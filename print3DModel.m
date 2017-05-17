@@ -55,7 +55,7 @@ T.Intensity=T.Intensity(T.Origin(:,3)<28.1,:);
 R.Origin = R.Origin(R.Origin(:,3)<28.1,:);
 T.Origin = T.Origin(T.Origin(:,3)<28.1,:);
 
-height = 10; % number of iterations of refraction/reflection
+height = 1; % number of iterations of refraction/reflection
 intensity = 0;
 
 % nice visualization of progess
@@ -112,7 +112,9 @@ disp(['Resulting intensity: ', num2str(BottleIntensity)]);
 disp(['Efficiency:          ', num2str(BottleIntensity/sum(Light.Intensity))]);
 
 % Print results only if requested ( print == 1 ):
-printresults = 0;
+% printresults = 0;
+printresults = chooseDialog;
+
 if printresults
     plot(Surface.Bottle,'FaceAlpha',0.2,'FaceLighting','gouraud','BackFaceLighting','unlit');
     for i = 2:height
