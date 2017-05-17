@@ -61,6 +61,8 @@ intensity = 0;
 % nice visualization of progess
 h = waitbar(0,['Calculating...', num2str(0), '%']);
 
+C = cell(height,1);
+
 BottleIntensity=0;
 for i = 2:height
     [T,R] = RayTrace(Surface,R);
@@ -90,18 +92,13 @@ for i = 2:height
     T.Direction = T.Direction(T.Origin(:,3)<above_roof,:);
     T.Origin = T.Origin(T.Origin(:,3)<above_roof,:);
     T.Intensity = T.Intensity(T.Origin(:,3)<above_roof,:);
-    printRays(T,10,'b-');
-
+    
     waitbar(i/height,h,['Calculating...', num2str(100*i/height), '%']);
     BottleIntensity=BottleIntensity + sum(T.Intensity);
 end
 
 close(h)
-
 toc
-
-% forces 3D view
-view(3)
 
 % resizes the output windows
 G.ZLim = [-10, 40];
@@ -113,5 +110,15 @@ view(3);
 disp(['Initial intensity:   ', num2str(sum(Light.Intensity))]);
 disp(['Resulting intensity: ', num2str(BottleIntensity)]);
 disp(['Efficiency:          ', num2str(BottleIntensity/sum(Light.Intensity))]);
+
+% Print results only if requested ( print == 1 ):
+print = 1;
+if print
+    for i = 2:height
+        printRays(C(i),10,'b-');
+    end
+end
+% forces 3D view
+view(3)
 
 hold off;
