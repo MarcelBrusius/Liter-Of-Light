@@ -100,7 +100,7 @@ for i = 1:length(above_roof_vec)
 
             
             BottleIntensity=BottleIntensity + sum(T.Intensity);
-            C{i} = T;
+            C{k} = T;
 
             disp(['Radient flux emitted from bottle under the roof: ',num2str(sum(T.Intensity))]);
         end
@@ -118,16 +118,17 @@ clear('vert');
 
 toc
 
+disp(['            Initial intensity : ', num2str(sum(Light.Intensity))]);
+disp(['Resulting intensity (maximal) : ', num2str(max(sum(BottleIntensityVec)))]);
+disp(['         Efficiency (maximal) : ', num2str(max(sum(BottleIntensityVec))/sum(Light.Intensity))]);
+
+
 % resizes the output windows
 G.ZLim = [-10, 40];
 G.XLim = [-15, 15];
 G.YLim = [-15, 15];
 
 view(3);
-
-disp(['Initial intensity:   ', num2str(sum(Light.Intensity))]);
-disp(['Resulting intensity: ', num2str(BottleIntensity)]);
-disp(['Efficiency:          ', num2str(BottleIntensity/sum(Light.Intensity))]);
 
 % Print results only if requested ( printresults == 1 ):
 % printresults = 0;
@@ -138,7 +139,7 @@ if printresults
     G = gca;
     plot(Surface.Bottle,'FaceAlpha',0.2,'FaceLighting','gouraud','BackFaceLighting','unlit');
     for i = 2:height
-        printRays(C(i),10,'b-');
+        printRays(C{i},10,'b-');
     end
 end
 % forces 3D view
