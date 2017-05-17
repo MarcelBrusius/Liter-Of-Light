@@ -67,12 +67,12 @@ function [ Surface ] = createSurface(vert)
     % hold on
 
     % Plot the bottle:
-    G = gca; %get current axes
+%     G = gca; %get current axes
     % trisurf(k,vert(:,1),vert(:,2),vert(:,3));
 %     axis square
     % alpha(0.3)
 
-    hold on
+%     hold on
 
     % boundary facets (represented by triangle vertices in every row) given in
     % "k", or accessible via alphaShape's boundaryFacets function:

@@ -9,7 +9,7 @@ function [Refraction,Reflection] = RayTrace( Surface , Light)
 %   triangles on surface as Refraction.Origin and their direction via
 %   Fresnel's equations and Snell's Law (external function)
     
-    G = gca; %get current axes
+%     G = gca; %get current axes
     
     % assert that the input variable "Light" is a matlab struct
     if isstruct(Light)
