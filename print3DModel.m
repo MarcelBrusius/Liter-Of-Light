@@ -128,7 +128,7 @@ G.ZLim = [-10, 40];
 G.XLim = [-15, 15];
 G.YLim = [-15, 15];
 
-view(3);
+
 
 % Print results only if requested ( printresults == 1 ):
 % printresults = 0;
@@ -141,8 +141,9 @@ if printresults
     for i = 2:height
         printRays(C{i},10,'b-');
     end
+    % forces 3D view
+    view(3)
 end
-% forces 3D view
-view(3)
+
 
 hold off;
