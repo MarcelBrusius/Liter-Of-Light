@@ -15,16 +15,17 @@ During daytime this design performs like a light bulb and delivers light equival
 ### Finished:
 + Create 3D model of a bottle (surface)
 + Model light rays
-
-### In progress:
 + Compute refraction and reflection direction on surface
 + Model outgoing light rays
+
+### In progress:
++ Model light intesity for incoming rays
++ Compute light intensity for outgoing rays
 + Bug fixing
 + Optimize performance
 
 ### Future:
-+ Model light intesity for incoming rays
-+ Compute light intensity for outgoing rays
++ Verify the claims/aims stated above
 + Using other representations of the surface, e.g. NURBs
     + Model other shapes
     + Generalize computations
