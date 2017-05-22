@@ -9,15 +9,14 @@ function choice = chooseDialog
     popup = uicontrol('Parent',d,...
            'Style','popup',...
            'Position',[75 70 100 25],...
-           'String',{'Yes';'No'},...
-           'Callback',@popup_callback);
+           'String',{'Yes';'No'});
+           
        
     btn = uicontrol('Parent',d,...
            'Position',[89 20 70 25],...
-           'String','Close',...
-           'Callback','delete(gcf)');
-       
-    choice = 'Red';
+           'String','ok',...
+           'Callback',@popup_callback);
+%            'Callback','delete(gcf)');
        
     % Wait for d to close before running to completion
     uiwait(d);
@@ -30,10 +29,11 @@ function choice = chooseDialog
           % For R2014a and earlier:
           % idx = get(popup,'Value');
           % popup_items = get(popup,'String');
-          if isequal(popup.String,'Yes')
+          if idx == 1
                 choice = 1;
-          elseif isequal(popup.String,'No')
+          elseif idx == 2
               choice = 0;
           end
+          close(d)
        end
 end

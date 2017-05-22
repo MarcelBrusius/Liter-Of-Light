@@ -17,6 +17,7 @@ IncidenceAngleVec = 180/pi*acos([0.197,0.424,0.627,0.792,0.908,0.968,0.966, ...
 InBottleVec = zeros(length(above_roof_vec),length(IncidenceAngleVec));
 OnBottleVec = zeros(length(above_roof_vec),length(IncidenceAngleVec));
 BottleIntensityVec = zeros(length(above_roof_vec),length(IncidenceAngleVec));
+RelativeIntensity = BottleIntensityVec;
 
 %number of sun rays
 n_rays=20;
@@ -27,6 +28,10 @@ Surface = createSurface(vert);
 
 % nice visualization of progess
 h = waitbar(0,['Calculating...', num2str(0), '%']);
+
+height = 10; % number of iterations of refraction/reflection
+C = cell(length(above_roof_vec),length(IncidenceAngleVec),height);
+iter = length(above_roof_vec)*length(IncidenceAngleVec);
 
 for i = 1:length(above_roof_vec)
     above_roof=above_roof_vec(i);
@@ -66,12 +71,12 @@ for i = 1:length(above_roof_vec)
         OnBottleVec(i,j)=sum(R.Intensity)+sum(T.Intensity);
         disp(['Radient flux on bottle surface: ',num2str(OnBottleVec(i,j))])
         InBottleVec(i,j)=sum(R.Intensity);
-        disp(['Radient flux transmitted into the bottle: ',num2str(InBottleVec(i,j))])
-
-        height = 10; % number of iterations of refraction/reflection
+        disp(['Radient flux transmitted into the bottle: ', ...
+            num2str(InBottleVec(i,j))])
+        
         intensity = 0;
-
-        C = cell(height,1);
+        
+        C{i,j,1} = R;
 
         BottleIntensity=0;
         for k = 2:height
@@ -93,23 +98,27 @@ for i = 1:length(above_roof_vec)
             R.Origin = R.Origin(R.Intensity>threshold,:);
             R.Intensity = R.Intensity(R.Intensity>threshold,:);
 
-            % print rays, and ignore those originating under the "roof" (threshold):
+            % ignore rays originating under the "roof" (threshold):
             T.Direction = T.Direction(T.Origin(:,3)<above_roof,:);
             T.Intensity = T.Intensity(T.Origin(:,3)<above_roof,:);
             T.Origin = T.Origin(T.Origin(:,3)<above_roof,:);
 
             
             BottleIntensity=BottleIntensity + sum(T.Intensity);
-            C{k} = T;
+            C{i,j,k} = T;
 
-            disp(['Radient flux emitted from bottle under the roof: ',num2str(sum(T.Intensity))]);
+            disp(['Radient flux emitted from bottle under the roof: ', ...
+                num2str(sum(T.Intensity))]);
         end
-        waitbar(((i-1)*length(above_roof_vec)+j)/(length(above_roof_vec)*length(above_roof_vec))...
-            ,h,['Calculating...', num2str(100*((i-1)*length(above_roof_vec)+j)/...
-            (length(above_roof_vec)*length(above_roof_vec))), '%']);
+        x = (i-1)*length(IncidenceAngleVec);
+        waitbar((x+j)/iter,h,['Calculating...', ...
+            num2str(round(100*((i-1)*length(IncidenceAngleVec)+j)/iter)), '%']);
 
         BottleIntensityVec(i,j)=BottleIntensity;
-        disp(['Total radient flux emitted from bottle under the roof: ',num2str(BottleIntensity)])
+        disp(['Total radient flux emitted from bottle under the roof: ', ...
+            num2str(BottleIntensity)])
+        
+        RelativeIntensity(i,j) = BottleIntensityVec(i,j)/sum(C{i,j,1}.Intensity);
     end
 end
 close(h)
@@ -118,9 +127,13 @@ clear('vert');
 
 toc
 
-disp(['            Initial intensity : ', num2str(sum(Light.Intensity))]);
-disp(['Resulting intensity (maximal) : ', num2str(max(sum(BottleIntensityVec)))]);
-disp(['         Efficiency (maximal) : ', num2str(max(sum(BottleIntensityVec))/sum(Light.Intensity))]);
+[row, col] = find(RelativeIntensity == max(max(RelativeIntensity)));
+
+
+disp(['            Initial intensity : ', num2str(sum(C{row,col,1}.Intensity))]);
+disp(['Resulting intensity (maximal) : ', num2str(BottleIntensityVec(row,col))]);
+disp(['         Efficiency (maximal) : ', num2str(RelativeIntensity(row,col)/...
+    sum(C{row,col,1}.Intensity))]);
 
 
 % resizes the output windows
@@ -138,8 +151,9 @@ if printresults
     F = figure(1);
     G = gca;
     plot(Surface.Bottle,'FaceAlpha',0.2,'FaceLighting','gouraud','BackFaceLighting','unlit');
-    for i = 2:height
-        printRays(C{i},10,'b-');
+    for i = 1:height
+        hold on;
+        printRays(C{row,col,i},10,'b-');
     end
     % forces 3D view
     view(3)
