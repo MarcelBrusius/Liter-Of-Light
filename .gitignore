@@ -1,1 +1,5 @@
 *.asv
+C++/.vs/
+*.filters
+C++/Debug/
+C++/Release/
