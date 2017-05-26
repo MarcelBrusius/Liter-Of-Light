@@ -1,6 +1,4 @@
 *.asv
-*.m
-*.mat
 C++/.vs/
 C++/Debug/
 C++/Release/
