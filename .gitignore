@@ -1,4 +1,6 @@
 *.asv
+*.m
+*.mat
 C++/.vs/
 *.filters
 C++/Debug/
