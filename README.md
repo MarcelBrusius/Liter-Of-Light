@@ -21,6 +21,7 @@ During daytime this design performs like a light bulb and delivers light equival
 ### In progress:
 + Model light intesity for incoming rays
 + Compute light intensity for outgoing rays
++ Port main routines to C++ for increase of performance
 + Bug fixing
 + Optimize performance
 
