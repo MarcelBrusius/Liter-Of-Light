@@ -3,3 +3,5 @@ C++/.vs/
 *.filters
 C++/Debug/
 C++/Release/
+/C++/x64/Debug
+*.user
