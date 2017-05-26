@@ -2,7 +2,6 @@
 *.m
 *.mat
 C++/.vs/
-*.filters
 C++/Debug/
 C++/Release/
 /C++/x64/Debug
