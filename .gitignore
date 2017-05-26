@@ -5,3 +5,7 @@ C++/Debug/
 C++/Release/
 /C++/x64/Debug
 *.user
+Cpp/.vs/
+Cpp/Debug/
+Cpp/Release/
+Cpp/x64/
