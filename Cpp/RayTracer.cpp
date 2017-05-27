@@ -16,108 +16,10 @@
 using namespace std;
 using namespace Eigen;
 
-#include "basicOperations.h"
+#include "ImportData.h"
+#include "Structures.h"
 
 double EPS = 0.0000001;
-
-// ------------------------- ImportData class -----------------------------
-
-class ImportData
-{
-public:
-	vector<Vector3d> Import(string filename, vector<Vector3d> v)
-	{
-		ifstream in(filename);
-		string record, val;
-
-		while (getline(in, record))
-		{
-			stringstream rec(record);
-			Vector3d row;
-			int i = 0;
-			while (getline(rec, val, ','))
-			{
-				row[i] = stod(val);
-				++i;
-			}
-			v.push_back(row);
-		}
-		return v;
-	}
-
-	Vector3d Import(string filename, Vector3d v)
-	{
-		ifstream in(filename);
-		string record;
-
-		int i = 0;
-		while (getline(in, record, ','))
-		{
-			v[i] = stod(record);
-			++i;
-		}
-		return v;
-	}
-
-	vector<double> Import(string filename, vector<double> v)
-	{
-		ifstream in(filename);
-		string record, val;
-
-		while (getline(in, record))
-		{
-			v.push_back(stod(record));
-		}
-		return v;
-	}
-};
-
-// ---------------------------- structures ---------------------------------
-
-struct Light
-{
-	vector<Vector3d> Origin;
-	vector<Vector3d> Direction; // normalized
-	vector<double> Intensity;
-	int RayNumber;
-};
-
-struct Surface
-{
-	vector<Vector3d> Vertices;
-	vector<Vector3d> Normal; // normalized
-	vector<Vector3d> Facets;
-	int NumFacets;
-};
-
-struct Contact
-{
-	vector<double> RayNumber;
-	vector<Vector3d> Vertices;
-	vector<double> Facets;
-	//vector<Vector3d> BoundaryFacet;
-	vector<double> Distance;
-};
-
-struct fresnelOutput 
-{
-	double reflectionRate;
-	double refractionRate;
-};
-
-struct snellsLawOutput 
-{
-	Vector3d reflectionDirection;
-	Vector3d refractionDirection;
-	double reflectionIntensity;
-	double refractionIntensity;
-};
-
-struct RayTrace
-{
-	Light refraction;
-	Light reflection;
-};
 
 // --------------------- global variables -------------------------
 
@@ -270,32 +172,5 @@ RayTrace RayTracer(Light &light, RayTrace &Interaction, Surface &surface, bool i
 	return Interaction;
 }
 
-int main()
-{
-	// initialize variables:
-	Light light, reflection, refraction;
-	Surface surface;
 
-	ImportData im;
-	light.Direction = im.Import("LightDirection.dat", light.Direction);
-	light.Origin = im.Import("LightOrigin.dat", light.Origin);
-	light.Intensity = im.Import("LightIntensity.dat", light.Intensity);
-	light.RayNumber = light.Direction.size();
 
-	
-	surface.Vertices = im.Import("SurfaceVertex.dat", surface.Vertices);
-	surface.Normal = im.Import("SurfaceNormal.dat", surface.Normal);
-	surface.Facets = im.Import("SurfaceFacets.dat", surface.Facets);
-	surface.NumFacets = surface.Facets.size();
-
-	RayTrace Interaction;
-	Interaction.reflection = light;
-	Interaction.refraction = light;
-
-	clock_t start = clock();
-	Interaction = RayTracer(light, Interaction, surface, false);
-	clock_t end = clock();
-
-	cout << "Elapsed time is: " << (end - start) / (double)CLOCKS_PER_SEC;
-
-}

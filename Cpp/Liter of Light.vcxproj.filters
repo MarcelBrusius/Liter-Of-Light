@@ -30,29 +30,47 @@
     <ClCompile Include="Light.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ImportData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Structures.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="basicOperations.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ImportData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Structures.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RayTracer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="LightDirection.dat">
+    <None Include="Data\LightDirection.dat">
       <Filter>Data Files</Filter>
     </None>
-    <None Include="LightIntensity.dat">
+    <None Include="Data\LightIntensity.dat">
       <Filter>Data Files</Filter>
     </None>
-    <None Include="LightOrigin.dat">
+    <None Include="Data\LightOrigin.dat">
       <Filter>Data Files</Filter>
     </None>
-    <None Include="SurfaceFacets.dat">
+    <None Include="Data\SurfaceFacets.dat">
       <Filter>Data Files</Filter>
     </None>
-    <None Include="SurfaceNormal.dat">
+    <None Include="Data\SurfaceNormal.dat">
       <Filter>Data Files</Filter>
     </None>
-    <None Include="SurfaceVertex.dat">
+    <None Include="Data\SurfaceVertex.dat">
       <Filter>Data Files</Filter>
     </None>
   </ItemGroup>
