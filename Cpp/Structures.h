@@ -40,22 +40,22 @@ struct Contact
 
 struct fresnelOutput
 {
-	double reflectionRate;
-	double refractionRate;
+	double ReflectionRate;
+	double RefractionRate;
 };
 
 struct snellsLawOutput
 {
-	Vector3d reflectionDirection;
-	Vector3d refractionDirection;
-	double reflectionIntensity;
-	double refractionIntensity;
+	Vector3d ReflectionDirection;
+	Vector3d RefractionDirection;
+	double ReflectionIntensity;
+	double RefractionIntensity;
 };
 
 struct RayTrace
 {
-	Light refraction;
-	Light reflection;
+	Light Refraction;
+	Light Reflection;
 };
 
 #endif // !STRUCTURE_H

@@ -29,7 +29,56 @@ double EPS = 0.0000001;
 
 // ------------------------ functions --------------------------------
 
-fresnelOutput fresnel(double n1, double n2, double c1, double c2) {
+int sign(double a)
+{
+	if (a > 0)
+		return 1;
+	else if (a < 0)
+		return -1;
+	else
+		return 0;
+}
+
+int sign(float a)
+{
+	if (a > 0)
+		return 1;
+	else if (a < 0)
+		return -1;
+	else
+		return 0;
+}
+
+int sign(int a)
+{
+	if (a > 0)
+		return 1;
+	else if (a < 0)
+		return -1;
+	else
+		return 0;
+}
+
+vector<bool> PreProcessing(Vector3d direction, vector<Vector3d> normal, bool inside)
+{
+	direction.normalize();
+	vector<bool> possiblerays(normal.size());
+	for (int i = 0; i < normal.size(); ++i)
+	{
+		double d = direction.dot(normal[i]);
+		if ((d > 0) && (inside))
+			possiblerays[i] = true;
+		/*else if ((d <= 0) && (inside))
+			possiblerays[i] = false;
+		else if ((d >= 0) && (!inside))
+			possiblerays[i] = false;*/
+		else if ((d < 0) && (!inside))
+			possiblerays[i] = true;
+	}
+	return possiblerays;
+}
+
+fresnelOutput fresnelEq(double n1, double n2, double c1, double c2) {
 
 	//FRESNEL computes the rate of reflection R
 	//and the rate of transmission T when light moves
@@ -45,16 +94,15 @@ fresnelOutput fresnel(double n1, double n2, double c1, double c2) {
 	double frel = c2 / c1;
 
 	//s-polarized light
-	double rs = pow(((-nrel*frel + 1) / (nrel*frel + 1)), 2);
+	double rs = pow(abs(n1*c1 - n2*c2) / abs(n1*c1 + n2*c2), 2);
 	//p-polarized light
-	double rp = pow(((nrel - frel) / (nrel + frel)), 2);
+	double rp = pow(abs(n2*c2 - n1*c1) / abs(n2*c2 + n1*c1), 2);
 	//assume unpolarised light
-	fresnelout.reflectionRate = 0.5*(rs + rp);
+	fresnelout.ReflectionRate = 0.5*(rs + rp);
 	//conservation of energy
-	fresnelout.refractionRate = 1 - fresnelout.reflectionRate;
+	fresnelout.RefractionRate = 1 - fresnelout.ReflectionRate;
 	return fresnelout;
 }
-
 
 snellsLawOutput snellsLaw(Vector3d normal, Vector3d direction, double intensity, double n1, double n2) 
 {
@@ -73,33 +121,34 @@ snellsLawOutput snellsLaw(Vector3d normal, Vector3d direction, double intensity,
 	//   - n2: Refractive index of the medium of the transmitted light ray
 
 	snellsLawOutput snellsout;
+
 	normal.normalize();
 	direction.normalize();
 	
-	double cos_theta_1 = normal.dot(-direction);
-	double cos_theta_2 = sqrt(1 - pow((n1 / n2), 2)*(1 - pow(cos_theta_1, 2)));
+	double cos_theta_1 = normal.dot(direction);
+	double cos_theta_2 = sqrt(1 - pow((n1 / n2), 2) * (1 - pow(cos_theta_1, 2)));
 
-	if (1 - pow((n1 / n2), 2)*(1 - pow(cos_theta_1, 2)) > 0) 
+	if (1 - pow((n1 / n2), 2) * (1 - pow(cos_theta_1, 2)) > 0)
 	{  // check for total reflection
 		
 
 		// Methode 1: Assume plastic doesn't change intensities
-		fresnelOutput fresnelout = fresnel(n1, n2, cos_theta_1, cos_theta_2);
+		fresnelOutput fresnelout = fresnelEq(n1, n2, cos_theta_1, cos_theta_2);
 		
-		snellsout.refractionDirection = (n1 / n2) * direction + ((n1 / n2)*cos_theta_1 - (cos_theta_2>0) - (cos_theta_1<0)*cos_theta_2)*normal;
-		snellsout.refractionDirection.normalize();
-		snellsout.refractionIntensity = intensity * fresnelout.refractionRate;
+		snellsout.RefractionDirection = (n1 / n2) * direction + ((n1 / n2) * cos_theta_1 - sign(cos_theta_1) * cos_theta_2) * normal;
+		snellsout.RefractionDirection.normalize();
+		snellsout.RefractionIntensity = intensity * fresnelout.RefractionRate;
 		
-		snellsout.reflectionIntensity = intensity * fresnelout.reflectionRate;
+		snellsout.ReflectionIntensity = intensity * fresnelout.ReflectionRate;
 	}
 	else 
 	{
-		snellsout.refractionDirection = { 0,0,0 };
-		snellsout.refractionIntensity = 0;
-		snellsout.reflectionIntensity = intensity;
+		snellsout.RefractionDirection = { 0,0,0 };
+		snellsout.RefractionIntensity = 0;
+		snellsout.ReflectionIntensity = intensity;
 	}
-	snellsout.reflectionDirection = direction + 2 * cos_theta_1*normal;
-	snellsout.reflectionDirection.normalize();
+	snellsout.ReflectionDirection = direction + 2 * cos_theta_1*normal;
+	snellsout.ReflectionDirection.normalize();
 	// what about the intensity?
 	
 	return snellsout;
@@ -113,11 +162,18 @@ RayTrace RayTracer(Light &light, RayTrace &Interaction, Surface &surface, bool i
 	//contact.BoundaryFacet = vector<Vector3d>(light.RayNumber);
 	contact.Facets = vector<double>(surface.NumFacets, -1);
 	contact.Distance = vector<double>(light.RayNumber);
+	for (int i = 0; i < surface.Normal.size(); ++i)
+		surface.Normal[i].normalize();
 
 	for (int ray = 0; ray < light.RayNumber; ++ray)
 	{
+		light.Direction[ray].normalize();
+		vector<bool> possiblerays = PreProcessing(light.Direction[ray], surface.Normal, inside);
 		for (int j = 0; j < surface.NumFacets; ++j)
 		{
+			if (!possiblerays[j])
+				continue;
+
 			Vector3d rhs = light.Origin[ray] - surface.Vertices[surface.Facets[j][0] - 1]; // checked, works
 			Matrix3d mat;
 			mat << -light.Direction[ray], surface.Vertices[surface.Facets[j][1] - 1] - surface.Vertices[surface.Facets[j][0] - 1], surface.Vertices[surface.Facets[j][2] - 1] - surface.Vertices[surface.Facets[j][0] - 1];
@@ -148,8 +204,8 @@ RayTrace RayTracer(Light &light, RayTrace &Interaction, Surface &surface, bool i
 				//contact.BoundaryFacet[ray] = surface.Facets[j];
 				// maybe add a mask like in the Matlab code
 
-				Interaction.reflection.Origin[ray] = light.Origin[ray] + contact.Distance[ray] * light.Direction[ray];
-				Interaction.refraction.Origin[ray] = light.Origin[ray] + contact.Distance[ray] * light.Direction[ray];
+				Interaction.Reflection.Origin[ray] = light.Origin[ray] + contact.Distance[ray] * light.Direction[ray];
+				Interaction.Refraction.Origin[ray] = light.Origin[ray] + contact.Distance[ray] * light.Direction[ray];
 
 				snellsLawOutput out;
 				if (inside) // check if light rays originate from within the bottle
@@ -160,17 +216,14 @@ RayTrace RayTracer(Light &light, RayTrace &Interaction, Surface &surface, bool i
 				{
 					out = snellsLaw(-surface.Normal[contact.Facets[ray]], light.Direction[ray], light.Intensity[ray], 1.0, 1.33);
 				}
-				Interaction.reflection.Direction[ray] = out.reflectionDirection;
-				Interaction.reflection.Intensity[ray] = out.reflectionIntensity;
+				Interaction.Reflection.Direction[ray] = out.ReflectionDirection;
+				Interaction.Reflection.Intensity[ray] = out.ReflectionIntensity;
 
-				Interaction.refraction.Direction[ray] = out.refractionDirection;
-				Interaction.reflection.Intensity[ray] = out.refractionIntensity;
+				Interaction.Refraction.Direction[ray] = out.RefractionDirection;
+				Interaction.Reflection.Intensity[ray] = out.RefractionIntensity;
 			}
 			
 		}
 	}
 	return Interaction;
 }
-
-
-

@@ -25,7 +25,15 @@ using namespace Eigen;
 
 // ---------------------------- declaration ----------------------------------
 
-fresnelOutput fresnel(double n1, double n2, double c1, double c2);
+int sign(double a);
+
+int sign(float a);
+
+int sign(int a);
+
+vector<bool> PreProcessing(vector<Vector3d> direction, vector<Vector3d> normal, bool inside);
+
+fresnelOutput fresnelEq(double n1, double n2, double c1, double c2);
 
 snellsLawOutput snellsLaw(Vector3d normal, Vector3d direction, double intensity, double n1, double n2);
 
