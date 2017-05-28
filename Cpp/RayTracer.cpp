@@ -12,7 +12,7 @@
 #include <ctime> // ermöglicht timer
 
 //#include <Eigen\Eigen> // matrix, vector classes for easy computations
-#include <Eigen> // matrix, vector classes for easy computations
+#include <Eigen\Eigen> // matrix, vector classes for easy computations
 using namespace std;
 using namespace Eigen;
 
