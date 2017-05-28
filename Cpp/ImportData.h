@@ -12,7 +12,7 @@
 #include <stdlib.h> // string to double conversion
 
 
-#include <Eigen\Eigen> // matrix, vector classes for easy computations
+#include <Eigen> // matrix, vector classes for easy computations
 
 using namespace std;
 using namespace Eigen;
@@ -20,11 +20,12 @@ using namespace Eigen;
 class ImportData
 {
 public:
-	vector<Vector3d> ImportData::Import(string filename, vector<Vector3d> v);
+//	vector<Vector3d> ImportData::Import(string filename, vector<Vector3d> v);
+	vector<Vector3d> Import(string filename, vector<Vector3d> v);
 
-	Vector3d ImportData::Import(string filename, Vector3d v);
+	Vector3d Import(string filename, Vector3d v);
 
-	vector<double> ImportData::Import(string filename, vector<double> v);
+	vector<double> Import(string filename, vector<double> v);
 };
 
 #endif
