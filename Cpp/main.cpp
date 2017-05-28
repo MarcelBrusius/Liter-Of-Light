@@ -2,16 +2,19 @@
 #include <cmath>
 #include <vector> // vector<class> template
 #include <iostream>
+//#include <stdlib.h> // string to double conversion
+
 #include <ctime> // ermöglicht timer
+
 #include <Eigen\Eigen> // matrix, vector classes for easy computations
+
+using namespace std;
+using namespace Eigen;
 
 #include "ImportData.h"
 #include "Structures.h"
 #include "RayTracer.h"
 #include "basicOperations.h"
-
-using namespace std;
-using namespace Eigen;
 
 int main(int argc, char** argv)
 {
