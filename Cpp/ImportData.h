@@ -12,7 +12,7 @@
 #include <stdlib.h> // string to double conversion
 
 
-#include <Eigen> // matrix, vector classes for easy computations
+#include <Eigen\Eigen> // matrix, vector classes for easy computations
 
 using namespace std;
 using namespace Eigen;

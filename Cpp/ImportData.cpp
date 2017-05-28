@@ -9,7 +9,7 @@
 
 
 //#include <Eigen\Eigen> // matrix, vector classes for easy computations
-#include <Eigen> // matrix, vector classes for easy computations
+#include <Eigen\Eigen> // matrix, vector classes for easy computations
 #include "ImportData.h"
 
 using namespace std;
