@@ -1,3 +1,11 @@
+/*
+* basicOperations.cpp
+*
+*  Updated on: 29.05.2017
+*      Author: Jannik Altevogt, Marcel Brusius
+*			   University of Kaiserslautern
+*/
+
 #include <iostream>
 #include <cmath>
 

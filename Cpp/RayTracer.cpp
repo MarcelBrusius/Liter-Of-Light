@@ -1,45 +1,34 @@
+/*
+* RayTracer.cpp
+*
+*  Updated on: 29.05.2017
+*      Author: Marcel Brusius
+*			   University of Kaiserslautern
+*/
+
 #include <numeric>
 #include <cmath>
 #include <vector> // vector<class> template
 #include <iostream> // input, output interaction via console
-
 #include <fstream> // file interactions
 #include <iterator>
 #include <sstream>
 #include <string>
 #include <stdlib.h> // string to double conversion
-
 #include <ctime> // ermöglicht timer
 
-//#include <Eigen\Eigen> // matrix, vector classes for easy computations
 #include <Eigen\Eigen> // matrix, vector classes for easy computations
-using namespace std;
-using namespace Eigen;
 
 #include "ImportData.h"
 #include "Structures.h"
 
+using namespace std;
+using namespace Eigen;
+
 double EPS = 0.0000001;
 
-// --------------------- global variables -------------------------
-
-//Contact contact;
-//Light light, reflection, refraction;
-//Surface surface;
-
 // ------------------------ functions --------------------------------
-
 int sign(double a)
-{
-	if (a > 0)
-		return 1;
-	else if (a < 0)
-		return -1;
-	else
-		return 0;
-}
-
-int sign(float a)
 {
 	if (a > 0)
 		return 1;
@@ -62,24 +51,20 @@ int sign(int a)
 vector<bool> PreProcessing(Vector3d direction, vector<Vector3d> normal, bool inside)
 {
 	direction.normalize();
-	vector<bool> possiblerays(normal.size());
+	vector<bool> possiblerays(normal.size()); // per default: vector of "false"
 	for (int i = 0; i < normal.size(); ++i)
 	{
 		double d = direction.dot(normal[i]);
 		if ((d > 0) && (inside))
 			possiblerays[i] = true;
-		/*else if ((d <= 0) && (inside))
-			possiblerays[i] = false;
-		else if ((d >= 0) && (!inside))
-			possiblerays[i] = false;*/
 		else if ((d < 0) && (!inside))
 			possiblerays[i] = true;
 	}
 	return possiblerays;
 }
 
-fresnelOutput fresnelEq(double n1, double n2, double c1, double c2) {
-
+fresnelOutput fresnelEq(double n1, double n2, double c1, double c2) 
+{
 	//FRESNEL computes the rate of reflection R
 	//and the rate of transmission T when light moves
 	//from medium M1 into medium M2,

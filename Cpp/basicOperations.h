@@ -2,7 +2,8 @@
  * basicOperations.h
  *
  *  Updated on: 28.05.2017
- *      Author: Jannik, Marcel
+ *      Author: Jannik Altevogt, Marcel Brusius
+ *			    University of Kaiserslautern
  */
 
 #ifndef BASICOPERATIONS_H_

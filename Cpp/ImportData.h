@@ -1,3 +1,11 @@
+/*
+* ImmportData.h
+*
+*  Updated on: 29.05.2017
+*      Author: Marcel Brusius
+*			   University of Kaiserslautern
+*/
+
 #pragma once
 #ifndef IMPORTDATA_H_
 #define IMPORTDATA_H_
@@ -10,7 +18,6 @@
 #include <fstream> // file interactions
 #include <iterator>
 #include <stdlib.h> // string to double conversion
-
 
 #include <Eigen\Eigen> // matrix, vector classes for easy computations
 
@@ -29,4 +36,3 @@ public:
 };
 
 #endif
-

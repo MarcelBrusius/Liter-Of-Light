@@ -1,3 +1,11 @@
+/*
+* Structures.h
+*
+*  Updated on: 29.05.2017
+*      Author: Marcel Brusius
+*			   University of Kaiserslautern
+*/
+
 #pragma once
 #ifndef STRUCTURE_H
 #define STRUCTURE_H

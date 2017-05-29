@@ -1,3 +1,11 @@
+/*
+* ImportData.cpp
+*
+*  Updated on: 29.05.2017
+*      Author: Marcel Brusius
+*			   University of Kaiserslautern
+*/
+
 #include <numeric>
 #include <cmath>
 #include <vector> // vector<class> template

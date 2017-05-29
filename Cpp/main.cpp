@@ -1,9 +1,18 @@
+/*
+* main.cpp
+*
+*  Updated on: 29.05.2017
+*      Author: Marcel Brusius
+*			   University of Kaiserslautern
+*/
+
 #include <numeric>
 #include <cmath>
 #include <vector> // vector<class> template
 #include <iostream>
 #include <ctime> // ermöglicht timer
 #include <Eigen\Eigen> // matrix, vector classes for easy computations
+//#include <mex.h> // provides Matlab pipeline
 
 #include "ImportData.h"
 #include "Structures.h"
@@ -15,6 +24,7 @@ using namespace Eigen;
 
 int main(int argc, char** argv)
 {
+	// ---------------------------- RayTracing ----------------------------
 	// initialize variables:
 	Light light;
 	Surface surface;
