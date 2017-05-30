@@ -62,20 +62,21 @@ vector<Vector3d> Mex2Vector3d(double *Data, size_t Size, const mwSize *Num)
 
 vector<double> Mex2Double(double *Data, size_t Size, const mwSize *Num)
 {
-	if (Size > 1)
+	if (Size > 2)
 	{
+		//mexPrintf("Size = %d", Size);
 		mexErrMsgTxt("Too many dimensions.");
 	}
-	if (Size < 1)
+	if (Size < 2)
 	{
 		mexErrMsgTxt("Not enough dimensions, expected matrix of dimension m by 3.");
 	}
 
 	mwSize ItemSize = Num[0];
 
-	if (ItemSize != 3)
+	if (ItemSize != 1)
 	{
-		mexErrMsgTxt("Expected matrix of dimension m by 3.");
+		mexErrMsgTxt("Expected matrix of dimension m by 1.");
 	}
 
 	vector<double> vec = vector<double>((int)Num[0]);
@@ -145,6 +146,16 @@ Surface Mex2Surface(const mxArray *Normal, const mxArray *Vertices, const mxArra
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 //int main(int argc, char** argv)
 {
+	// ---- Assert input and output count ---------------------------------------------------------
+	if (nrhs != 6)
+	{
+		mexErrMsgTxt("Not enough input arguments.");
+	}
+	if (nlhs != 6)
+	{
+		mexErrMsgTxt("Not enough output arguments.");
+	}
+
 	// ---- Mex2Eigen -----------------------------------------------------------------------------
 	//		IN:
 	// Surface Normal
@@ -165,7 +176,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 
 	// ---- RayTracing ----------------------------------------------------------------------------
-	// initialize variables:
+	// Read Data:
 	/*Light light;
 	Surface surface;
 
@@ -190,10 +201,15 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	Interaction = RayTracer(light, Interaction, surface, false);
 	clock_t end = clock();
 
-	cout << "Elapsed time is: " << (end - start) / (double)CLOCKS_PER_SEC << '\n';
+	/*cout << "Elapsed time is: " << (end - start) / (double)CLOCKS_PER_SEC << '\n';
 	cout << "Incoming light intensity: " << sumVector(light.Intensity) << '\n';
 	cout << "Reflected light intensity :" << sumVector(Interaction.Reflection.Intensity) << '\n';
-	cout << "Refracted light intensity :" << sumVector(Interaction.Refraction.Intensity) << '\n';
+	cout << "Refracted light intensity :" << sumVector(Interaction.Refraction.Intensity) << '\n';*/
+
+	mexPrintf("Elapsed time is           : %d \n", (end - start) / (double)CLOCKS_PER_SEC);
+	mexPrintf("Incoming light intensity  : %d \n", sumVector(light.Intensity));
+	mexPrintf("Reflected light intensity : %d \n", sumVector(Interaction.Reflection.Intensity));
+	mexPrintf("Refracted light intensity : %d \n", sumVector(Interaction.Refraction.Intensity));
 
 	// ---- Eigen2Mex -----------------------------------------------------------------------------
 	
