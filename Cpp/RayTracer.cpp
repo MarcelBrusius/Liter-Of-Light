@@ -159,14 +159,27 @@ RayTrace RayTracer(Light &light, RayTrace &Interaction, Surface &surface, bool i
 			if (!possiblerays[j])
 				continue;
 
-			Vector3d rhs = light.Origin[ray] - surface.Vertices[surface.Facets[j][0] - 1]; // checked, works
-			Matrix3d mat;
+			Vector3d rhs = light.Origin[ray] - surface.Vertices[surface.Facets[j][0] - 1];
+			Matrix3d mat, matx, maty, matz;
 			mat << -light.Direction[ray], surface.Vertices[surface.Facets[j][1] - 1] - surface.Vertices[surface.Facets[j][0] - 1], surface.Vertices[surface.Facets[j][2] - 1] - surface.Vertices[surface.Facets[j][0] - 1];
-			Vector3d res = mat.colPivHouseholderQr().solve(rhs);
+			//Vector3d res = mat.colPivHouseholderQr().solve(rhs);
+			//double t = res[0];
+			//double beta = res[1];
+			//double gamma = res[2];
 
-			double t = res[0];
-			double beta = res[1];
-			double gamma = res[2];
+			// Use Cramer's Rule:
+			matx << rhs, surface.Vertices[surface.Facets[j][1] - 1] - surface.Vertices[surface.Facets[j][0] - 1], surface.Vertices[surface.Facets[j][2] - 1] - surface.Vertices[surface.Facets[j][0] - 1];
+			maty << -light.Direction[ray], rhs, surface.Vertices[surface.Facets[j][2] - 1] - surface.Vertices[surface.Facets[j][0] - 1];
+			matx << -light.Direction[ray], surface.Vertices[surface.Facets[j][1] - 1] - surface.Vertices[surface.Facets[j][0] - 1], rhs;
+			
+			double det = mat.determinant();
+			double detx = matx.determinant();
+			double dety = maty.determinant();
+			double detz = matz.determinant();
+
+			double t = detx / det;
+			double beta = dety / det;
+			double gamma = detz / det;
 
 			if ((t > 0) && (beta > 0) && (gamma > 0) && (beta < 1) && (gamma < 1) && (beta + gamma < 1))
 			{
