@@ -27,7 +27,7 @@
 using namespace std;
 using namespace Eigen;
 
-// -------------------------- Mex2Eigen Function -------------------------------
+// ---- Mex2Eigen Functions -----------------------------------------------------------------------
 
 vector<Vector3d> Mex2Vector3d(double *Data, size_t Size, const mwSize *Num)
 {
@@ -100,14 +100,14 @@ Light Mex2Light(const mxArray *Direction, const mxArray *Origin, const mxArray *
 	light.RayNumber = Num[0];
 
 	double *OriginData = mxGetPr(Origin);
-	size_t Size = mxGetNumberOfDimensions(Origin);
-	const mwSize *Num = mxGetDimensions(Origin);
+	Size = mxGetNumberOfDimensions(Origin);
+	Num = mxGetDimensions(Origin);
 	
 	light.Origin = Mex2Vector3d(OriginData, Size, Num);
 
 	double *IntensityData = mxGetPr(Intensity);
-	size_t Size = mxGetNumberOfDimensions(Intensity);
-	const mwSize *Num = mxGetDimensions(Intensity);
+	Size = mxGetNumberOfDimensions(Intensity);
+	Num = mxGetDimensions(Intensity);
 
 	light.Intensity = Mex2Double(IntensityData, Size, Num);
 
@@ -125,14 +125,14 @@ Surface Mex2Surface(const mxArray *Normal, const mxArray *Vertices, const mxArra
 	surface.Normal = Mex2Vector3d(NormalData, Size, Num);
 
 	double *VerticesData = mxGetPr(Vertices);
-	size_t Size = mxGetNumberOfDimensions(Vertices);
-	const mwSize *Num = mxGetDimensions(Vertices);
+	Size = mxGetNumberOfDimensions(Vertices);
+	Num = mxGetDimensions(Vertices);
 
 	surface.Vertices = Mex2Vector3d(VerticesData, Size, Num);
 
 	double *FacetsData = mxGetPr(Facets);
-	size_t Size = mxGetNumberOfDimensions(Facets);
-	const mwSize *Num = mxGetDimensions(Facets);
+	Size = mxGetNumberOfDimensions(Facets);
+	Num = mxGetDimensions(Facets);
 
 	surface.Facets = Mex2Vector3d(FacetsData, Size, Num);
 	surface.NumFacets = Num[0];
@@ -140,11 +140,12 @@ Surface Mex2Surface(const mxArray *Normal, const mxArray *Vertices, const mxArra
 	return surface;
 }
 
-
+// ---- Mex Gateway -------------------------------------------------------------------------------
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 //int main(int argc, char** argv)
 {
+	// ---- Mex2Eigen -----------------------------------------------------------------------------
 	//		IN:
 	// Surface Normal
 	// Surface Vertices
@@ -154,28 +155,16 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	// Light Origin
 	// Light Intensity
 	
-	// --------------------------- Mex2Eigen Surface --------------------------------
+	// ---- Mex2Eigen Surface ---------------------------------------------------------------------
 	Surface surface = Mex2Surface(prhs[0], prhs[1], prhs[2]);
 
-	// --------------------------- Mex2Eigen Light --------------------------------
+	// ---- Mex2Eigen Light -----------------------------------------------------------------------
 	Light light = Mex2Light(prhs[3], prhs[4], prhs[5]);
 
-	//		OUT:
-	// Refraction Direction
-	// Refraction Origin
-	// Refraction Intensity
-	//
-	// Reflection Direction
-	// Reflection Origin
-	// Reflection Intensity
-
-	double *RefractionDirection, *RefractionOrigin, *RefractionIntensity;
-	double *ReflectionDirection, *ReflectionOrigin, *ReflectionIntensity;
+	
 
 
-
-
-	// ---------------------------- RayTracing ----------------------------
+	// ---- RayTracing ----------------------------------------------------------------------------
 	// initialize variables:
 	/*Light light;
 	Surface surface;
@@ -206,5 +195,53 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	cout << "Reflected light intensity :" << sumVector(Interaction.Reflection.Intensity) << '\n';
 	cout << "Refracted light intensity :" << sumVector(Interaction.Refraction.Intensity) << '\n';
 
+	// ---- Eigen2Mex -----------------------------------------------------------------------------
+	
+	//		OUT:
+	// Refraction Direction
+	// Refraction Origin
+	// Refraction Intensity
+	//
+	// Reflection Direction
+	// Reflection Origin
+	// Reflection Intensity
+
+	double *RefractionDirection, *RefractionOrigin, *RefractionIntensity;
+	double *ReflectionDirection, *ReflectionOrigin, *ReflectionIntensity;
+
+	size_t Size = mxGetNumberOfDimensions(prhs[3]);
+	const mwSize *NumVec = mxGetDimensions(prhs[3]);
+	
+	//mwSize* dims = (mwSize*)mxCalloc(Ps - 1, sizeof(mwSize))
+
+	plhs[0] = mxCreateNumericArray(Size, NumVec, mxDOUBLE_CLASS, mxREAL);
+	RefractionDirection = mxGetPr(plhs[0]);
+	plhs[1] = mxCreateNumericArray(Size, NumVec, mxDOUBLE_CLASS, mxREAL);
+	RefractionOrigin = mxGetPr(plhs[1]);
+	plhs[3] = mxCreateNumericArray(Size, NumVec, mxDOUBLE_CLASS, mxREAL);
+	ReflectionDirection = mxGetPr(plhs[3]);
+	plhs[4] = mxCreateNumericArray(Size, NumVec, mxDOUBLE_CLASS, mxREAL);
+	ReflectionOrigin = mxGetPr(plhs[4]);
+
+	//size_t SizeIntensity = mxGetNumberOfDimensions(prhs[5]);
+	const mwSize *NumInt = mxGetDimensions(prhs[5]);
+
+	plhs[2] = mxCreateNumericArray(Size, NumInt, mxDOUBLE_CLASS, mxREAL);
+	RefractionIntensity = mxGetPr(plhs[2]);
+	plhs[5] = mxCreateNumericArray(Size, NumInt, mxDOUBLE_CLASS, mxREAL);
+	ReflectionIntensity = mxGetPr(plhs[5]);
+
+	for (mwSize i = 0; i < NumVec[0]; ++i)
+	{
+		for (mwSize j = 0; j < 3; ++j)
+		{
+			RefractionDirection[i + 3 * j] = Interaction.Refraction.Direction[i][j];
+			RefractionOrigin[i + 3 * j] = Interaction.Refraction.Origin[i][j];
+			ReflectionDirection[i + 3 * j] = Interaction.Reflection.Direction[i][j];
+			ReflectionOrigin[i + 3 * j] = Interaction.Reflection.Origin[i][j];
+		}
+		RefractionIntensity[i] = Interaction.Refraction.Intensity[i];
+		ReflectionIntensity[i] = Interaction.Reflection.Intensity[i];
+	}
 	//return 0;
 }
