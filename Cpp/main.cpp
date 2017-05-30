@@ -29,117 +29,123 @@ using namespace Eigen;
 
 // ---- Mex2Eigen Functions -----------------------------------------------------------------------
 
-vector<Vector3d> Mex2Vector3d(double *Data, size_t Size, const mwSize *Num)
-{
-	if (Size > 2)
-	{
-		mexErrMsgTxt("Too many dimensions.");
-	}
-	if (Size < 2)
-	{
-		mexErrMsgTxt("Not enough dimensions, expected matrix of dimension m by 3.");
-	}
+//vector<Vector3d> Mex2Vector3d(double *Data, size_t Size, const mwSize *Num)
+//{
+//	if (Size > 2)
+//	{
+//		mexErrMsgTxt("Too many dimensions.");
+//	}
+//	if (Size < 2)
+//	{
+//		mexErrMsgTxt("Not enough dimensions, expected matrix of dimension m by 3.");
+//	}
+//
+//	mwSize ItemSize = Num[1];
+//
+//	if (ItemSize != 3)
+//	{
+//		mexErrMsgTxt("Expected matrix of dimension m by 3.");
+//	}
+//
+//	vector<Vector3d> vec = vector<Vector3d>((int)Num[0]);
+//
+//	for (mwSize i = 0; i < Num[0]; ++i)
+//	{
+//		for (mwSize j = 0; j < 3; ++j)
+//		{
+//			vec[i][j] = Data[i + 3 * j];
+//		}
+//	}
+//
+//	return vec;
+//}
 
-	mwSize ItemSize = Num[1];
+//vector<double> Mex2Double(double *Data, size_t Size, const mwSize *Num)
+//{
+//	if (Size > 2)
+//	{
+//		//mexPrintf("Size = %d", Size);
+//		mexErrMsgTxt("Too many dimensions.");
+//	}
+//	if (Size < 2)
+//	{
+//		mexErrMsgTxt("Not enough dimensions, expected matrix of dimension m by 1.");
+//	}
+//
+//	mwSize ItemSize = Num[1];
+//
+//	if (ItemSize != 1)
+//	{
+//		mexPrintf("ItemSize = %d, Num = [%d,%d].", ItemSize, Num[0], Num[1]);
+//		mexErrMsgTxt("Expected matrix of dimension m by 1.");
+//	}
+//
+//	vector<double> vec = vector<double>((int)Num[0]);
+//
+//	for (mwSize i = 0; i < Num[0]; ++i)
+//	{
+//		vec[i] = Data[i];
+//		mexPrintf("Data[%i] = %d \n", i, Data[i]);
+//		mexPrintf("Vec[%i] = %d \n", i, vec[i]);
+//	}
+//
+//	return vec;
+//}
 
-	if (ItemSize != 3)
-	{
-		mexErrMsgTxt("Expected matrix of dimension m by 3.");
-	}
+//Light Mex2Light(const mxArray *Direction, const mxArray *Origin, const mxArray *Intensity)
+//{
+//	Light light;
+//
+//	double *DirectionData = mxGetPr(Direction);
+//	size_t Size = mxGetNumberOfDimensions(Direction);
+//	const mwSize *Num = mxGetDimensions(Direction);
+//
+//	light.Direction = Mex2Vector3d(DirectionData, Size, Num);
+//	light.RayNumber = Num[0];
+//
+//	double *OriginData = mxGetPr(Origin);
+//	Size = mxGetNumberOfDimensions(Origin);
+//	Num = mxGetDimensions(Origin);
+//	
+//	light.Origin = Mex2Vector3d(OriginData, Size, Num);
+//
+//	double *IntensityData = mxGetPr(Intensity);
+//	Size = mxGetNumberOfDimensions(Intensity);
+//	Num = mxGetDimensions(Intensity);
+//
+//	light.Intensity = Mex2Double(IntensityData, Size, Num);
+//
+//
+//	return light;
+//}
 
-	vector<Vector3d> vec = vector<Vector3d>((int)Num[0]);
-
-	for (mwSize i = 0; i < Num[0]; ++i)
-	{
-		for (mwSize j = 0; j < 3; ++j)
-		{
-			vec[i][j] = Data[i + 3 * j];
-		}
-	}
-
-	return vec;
-}
-
-vector<double> Mex2Double(double *Data, size_t Size, const mwSize *Num)
-{
-	if (Size > 2)
-	{
-		//mexPrintf("Size = %d", Size);
-		mexErrMsgTxt("Too many dimensions.");
-	}
-	if (Size < 2)
-	{
-		mexErrMsgTxt("Not enough dimensions, expected matrix of dimension m by 3.");
-	}
-
-	mwSize ItemSize = Num[0];
-
-	if (ItemSize != 1)
-	{
-		mexErrMsgTxt("Expected matrix of dimension m by 1.");
-	}
-
-	vector<double> vec = vector<double>((int)Num[0]);
-
-	for (mwSize i = 0; i < Num[0]; ++i)
-	{
-		vec[i] = Data[i];
-	}
-
-	return vec;
-}
-
-Light Mex2Light(const mxArray *Direction, const mxArray *Origin, const mxArray *Intensity)
-{
-	Light light;
-
-	double *DirectionData = mxGetPr(Direction);
-	size_t Size = mxGetNumberOfDimensions(Direction);
-	const mwSize *Num = mxGetDimensions(Direction);
-
-	light.Direction = Mex2Vector3d(DirectionData, Size, Num);
-	light.RayNumber = Num[0];
-
-	double *OriginData = mxGetPr(Origin);
-	Size = mxGetNumberOfDimensions(Origin);
-	Num = mxGetDimensions(Origin);
-	
-	light.Origin = Mex2Vector3d(OriginData, Size, Num);
-
-	double *IntensityData = mxGetPr(Intensity);
-	Size = mxGetNumberOfDimensions(Intensity);
-	Num = mxGetDimensions(Intensity);
-
-	light.Intensity = Mex2Double(IntensityData, Size, Num);
-
-	return light;
-}
-
-Surface Mex2Surface(const mxArray *Normal, const mxArray *Vertices, const mxArray *Facets)
-{
-	Surface surface;
-
-	double *NormalData = mxGetPr(Normal);
-	size_t Size = mxGetNumberOfDimensions(Normal);
-	const mwSize *Num = mxGetDimensions(Normal);
-
-	surface.Normal = Mex2Vector3d(NormalData, Size, Num);
-
-	double *VerticesData = mxGetPr(Vertices);
-	Size = mxGetNumberOfDimensions(Vertices);
-	Num = mxGetDimensions(Vertices);
-
-	surface.Vertices = Mex2Vector3d(VerticesData, Size, Num);
-
-	double *FacetsData = mxGetPr(Facets);
-	Size = mxGetNumberOfDimensions(Facets);
-	Num = mxGetDimensions(Facets);
-
-	surface.Facets = Mex2Vector3d(FacetsData, Size, Num);
-	surface.NumFacets = Num[0];
-
-	return surface;
-}
+//Surface Mex2Surface(const mxArray *Normal, const mxArray *Vertices, const mxArray *Facets)
+//{
+//	Surface surface;
+//
+//	double *NormalData = mxGetPr(Normal);
+//	size_t Size = mxGetNumberOfDimensions(Normal);
+//	const mwSize *Num = mxGetDimensions(Normal);
+//
+//	surface.Normal = Mex2Vector3d(NormalData, Size, Num);
+//
+//	double *VerticesData = mxGetPr(Vertices);
+//	Size = mxGetNumberOfDimensions(Vertices);
+//	Num = mxGetDimensions(Vertices);
+//
+//	surface.Vertices = Mex2Vector3d(VerticesData, Size, Num);
+//
+//	double *FacetsData = mxGetPr(Facets);
+//	Size = mxGetNumberOfDimensions(Facets);
+//	Num = mxGetDimensions(Facets);
+//
+//	surface.Facets = Mex2Vector3d(FacetsData, Size, Num);
+//	surface.NumFacets = Num[0];
+//
+//
+//
+//	return surface;
+//}
 
 // ---- Mex Gateway -------------------------------------------------------------------------------
 
@@ -149,11 +155,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	// ---- Assert input and output count ---------------------------------------------------------
 	if (nrhs != 6)
 	{
-		mexErrMsgTxt("Not enough input arguments.");
+		mexErrMsgTxt("Not enough input arguments. \n");
 	}
 	if (nlhs != 6)
 	{
-		mexErrMsgTxt("Not enough output arguments.");
+		mexErrMsgTxt("Not enough output arguments. \n");
 	}
 
 	// ---- Mex2Eigen -----------------------------------------------------------------------------
@@ -167,14 +173,116 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	// Light Intensity
 	
 	// ---- Mex2Eigen Surface ---------------------------------------------------------------------
-	Surface surface = Mex2Surface(prhs[0], prhs[1], prhs[2]);
+	//Surface surface = Mex2Surface(prhs[0], prhs[1], prhs[2]);
+	Surface surface;
 
+	double *NormalData = mxGetPr(prhs[0]);
+	size_t NormalSize = mxGetNumberOfDimensions(prhs[0]);
+	const mwSize *NormalNum = mxGetDimensions(prhs[0]);
+
+	//surface.Normal = Mex2Vector3d(NormalData, NormalSize, NormalNum);
+
+	double *VerticesData = mxGetPr(prhs[1]);
+	size_t VerticesSize = mxGetNumberOfDimensions(prhs[1]);
+	const mwSize *VerticesNum = mxGetDimensions(prhs[1]);
+
+	//surface.Vertices = Mex2Vector3d(VerticesData, VerticesSize, VerticesNum);
+
+	double *FacetsData = mxGetPr(prhs[2]);
+	size_t FacetsSize = mxGetNumberOfDimensions(prhs[2]);
+	const mwSize *FacetsNum = mxGetDimensions(prhs[2]);
+
+	//surface.Facets = Mex2Vector3d(FacetsData, FacetsSize, FacetsNum);
+	surface.NumFacets = NormalNum[0];
+
+	if ((NormalSize > 2) || (VerticesSize > 2) || (FacetsSize > 2))
+	{
+		mexErrMsgTxt("Too many dimensions. \n");
+	}
+	if ((NormalSize < 2) || (VerticesSize < 2) || (FacetsSize < 2))
+	{
+		mexErrMsgTxt("Not enough dimensions, expected matrix of dimension m by 3. \n");
+	}
+
+	if ((NormalNum[1] != 3) || (VerticesNum[1] != 3) || (FacetsNum[1] != 3))
+	{
+		mexErrMsgTxt("Expected matrix of dimension m by 3. \n");
+	}
+
+	surface.Normal = vector<Vector3d>((int)NormalNum[0]);
+	surface.Vertices = vector<Vector3d>((int)VerticesNum[0]);
+	surface.Facets = vector<Vector3d>((int)FacetsNum[0]);
+
+	for (mwSize i = 0; i < NormalNum[0]; ++i)
+	{
+		for (mwSize j = 0; j < 3; ++j)
+		{
+mexPrintf("Iteration %i \n", i + 3 * j);
+			//mexPrintf("Facet: %d \n", FacetsData[j + 3 * i]);
+			surface.Normal[i][j] = NormalData[j + 3 * i];
+			surface.Vertices[i][j] = VerticesData[j + 3 * i];
+			surface.Facets[i][j] = FacetsData[j + 3 * i];
+			//mexPrintf("NormalData[%i] = %d \n", i, NormalData[i]);
+			//mexPrintf("Normal[%i] = %d \n", i, surface.Normal[i]);
+		}
+	}
 	// ---- Mex2Eigen Light -----------------------------------------------------------------------
-	Light light = Mex2Light(prhs[3], prhs[4], prhs[5]);
+	//Light light = Mex2Light(prhs[3], prhs[4], prhs[5]);
+	Light light;
+	double *DirectionData = mxGetPr(prhs[3]);
+	size_t DirectionSize = mxGetNumberOfDimensions(prhs[3]);
+	const mwSize *DirectionNum = mxGetDimensions(prhs[3]);
 
-	
+	//light.Direction = Mex2Vector3d(DirectionData, DirectionSize, DirectionNum);
 
+	double *OriginData = mxGetPr(prhs[4]);
+	size_t OriginSize = mxGetNumberOfDimensions(prhs[4]);
+	const mwSize *OriginNum = mxGetDimensions(prhs[4]);
 
+	//light.Origin = Mex2Vector3d(OriginData, OriginSize, OriginNum);
+
+	double *IntensityData = mxGetPr(prhs[5]);
+	size_t IntensitySize = mxGetNumberOfDimensions(prhs[5]);
+	const mwSize *IntensityNum = mxGetDimensions(prhs[5]);
+
+	//light.Intensity = Mex2Vector3d(IntensityData, IntensitySize, IntensityNum);
+	light.RayNumber = DirectionNum[0];
+
+	if ((DirectionSize > 2) || (OriginSize > 2) || (IntensitySize > 2))
+	{
+		mexErrMsgTxt("Too many dimensions. \n");
+	}
+	if ((DirectionSize < 2) || (OriginSize < 2) || (IntensitySize < 2))
+	{
+		mexErrMsgTxt("Not enough dimensions, expected matrix of dimension m by 3. \n");
+	}
+
+	if ((DirectionNum[1] != 3) || (OriginNum[1] != 3))
+	{
+		mexErrMsgTxt("Expected matrix of dimension m by 3. \n");
+	}
+	if (IntensityNum[1] != 1)
+	{
+		mexErrMsgTxt("Expected matrix of dimension m by 1.");
+	}
+	if ((DirectionNum[0] != OriginNum[0]) || (IntensityNum[0] != OriginNum[0]) || (DirectionNum[0] != IntensityNum[0]))
+	{
+		mexErrMsgTxt("Input 4 - 6 are not of same size. \n");
+	}
+
+	light.Direction = vector<Vector3d>((int)DirectionNum[0]);
+	light.Origin = vector<Vector3d>((int)OriginNum[0]);
+	light.Intensity = vector<double>((int)IntensityNum[0]);
+	for (mwSize i = 0; i < DirectionNum[0]; ++i)
+	{
+		light.Intensity[i] = IntensityData[i];
+		for (mwSize j = 0; j < 3; ++j)
+		{
+			light.Direction[i][j] = NormalData[j + 3 * i];
+			light.Origin[i][j] = VerticesData[j + 3 * i];
+			
+		}
+	}
 	// ---- RayTracing ----------------------------------------------------------------------------
 	// Read Data:
 	/*Light light;
@@ -206,7 +314,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	cout << "Reflected light intensity :" << sumVector(Interaction.Reflection.Intensity) << '\n';
 	cout << "Refracted light intensity :" << sumVector(Interaction.Refraction.Intensity) << '\n';*/
 
-	mexPrintf("Elapsed time is           : %d \n", (end - start) / (double)CLOCKS_PER_SEC);
+	mexPrintf("Elapsed time is           : %d \n", (double)(end - start) / (double)CLOCKS_PER_SEC);
 	mexPrintf("Incoming light intensity  : %d \n", sumVector(light.Intensity));
 	mexPrintf("Reflected light intensity : %d \n", sumVector(Interaction.Reflection.Intensity));
 	mexPrintf("Refracted light intensity : %d \n", sumVector(Interaction.Refraction.Intensity));
@@ -251,10 +359,10 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	{
 		for (mwSize j = 0; j < 3; ++j)
 		{
-			RefractionDirection[i + 3 * j] = Interaction.Refraction.Direction[i][j];
-			RefractionOrigin[i + 3 * j] = Interaction.Refraction.Origin[i][j];
-			ReflectionDirection[i + 3 * j] = Interaction.Reflection.Direction[i][j];
-			ReflectionOrigin[i + 3 * j] = Interaction.Reflection.Origin[i][j];
+			RefractionDirection[j + 3 * i] = Interaction.Refraction.Direction[i][j];
+			RefractionOrigin[j + 3 * i] = Interaction.Refraction.Origin[i][j];
+			ReflectionDirection[j + 3 * i] = Interaction.Reflection.Direction[i][j];
+			ReflectionOrigin[j + 3 * i] = Interaction.Reflection.Origin[i][j];
 		}
 		RefractionIntensity[i] = Interaction.Refraction.Intensity[i];
 		ReflectionIntensity[i] = Interaction.Reflection.Intensity[i];
