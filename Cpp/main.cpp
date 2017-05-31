@@ -228,9 +228,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 			surface.Facets[i][j] = FacetsData[j + 3 * i];
 		}
 	}
+
+	Surface *surfacePtr = &surface;
+
 	// ---- Mex2Eigen Light -----------------------------------------------------------------------
 	//Light light = Mex2Light(prhs[3], prhs[4], prhs[5]);
 	Light light;
+
 	double *DirectionData = mxGetPr(prhs[3]);
 	size_t DirectionSize = mxGetNumberOfDimensions(prhs[3]);
 	const mwSize *DirectionNum = mxGetDimensions(prhs[3]);
@@ -246,6 +250,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	double *IntensityData = mxGetPr(prhs[5]);
 	size_t IntensitySize = mxGetNumberOfDimensions(prhs[5]);
 	const mwSize *IntensityNum = mxGetDimensions(prhs[5]);
+
+	Light *lightPtr = &light;
 
 	//light.Intensity = Mex2Vector3d(IntensityData, IntensitySize, IntensityNum);
 	light.RayNumber = DirectionNum[0];
@@ -308,9 +314,11 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	Interaction.Reflection.Intensity = vector<double>(light.RayNumber,0);
 	Interaction.Refraction = light;
 	Interaction.Refraction.Intensity = vector<double>(light.RayNumber,0);
+	RayTrace *InteractionPtr = &Interaction;
 
 	clock_t start = clock();
-	Interaction = RayTracer(light, Interaction, surface, false);
+	/*Interaction = */
+	RayTracer(lightPtr, InteractionPtr, surfacePtr, false);
 	clock_t end = clock();
 
 	/*

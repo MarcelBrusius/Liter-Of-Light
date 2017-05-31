@@ -34,12 +34,12 @@ int sign(double a);
 
 int sign(int a);
 
-vector<bool> PreProcessing(Vector3d direction, vector<Vector3d> normal, bool inside);
+vector<bool> PreProcessing(Vector3d direction, Surface *surface, bool inside);
 
 fresnelOutput fresnelEq(double n1, double n2, double c1, double c2);
 
 snellsLawOutput snellsLaw(Vector3d normal, Vector3d direction, double intensity, double n1, double n2);
 
-RayTrace RayTracer(Light &light, RayTrace &Interaction, Surface &surface, bool inside);
+void RayTracer(Light *light, RayTrace *Interaction, Surface *surface, bool inside);
 
 #endif // !RAYTRACER_H

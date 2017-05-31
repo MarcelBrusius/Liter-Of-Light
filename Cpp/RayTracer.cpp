@@ -49,13 +49,13 @@ int sign(int a)
 		return 0;
 }
 
-vector<bool> PreProcessing(Vector3d direction, vector<Vector3d> normal, bool inside)
+vector<bool> PreProcessing(Vector3d direction, Surface *surface, bool inside)
 {
 	direction.normalize();
-	vector<bool> possiblerays(normal.size()); // per default: vector of "false"
-	for (int i = 0; i < normal.size(); ++i)
+	vector<bool> possiblerays(surface->Normal.size()); // per default: vector of "false"
+	for (int i = 0; i < surface->Normal.size(); ++i)
 	{
-		double d = direction.dot(normal[i]);
+		double d = direction.dot(surface->Normal[i]);
 		if ((d > 0) && (inside))
 			possiblerays[i] = true;
 		else if ((d < 0) && (!inside))
@@ -133,37 +133,37 @@ snellsLawOutput snellsLaw(Vector3d normal, Vector3d direction, double intensity,
 		snellsout.RefractionIntensity = 0;
 		snellsout.ReflectionIntensity = intensity;
 	}
-	snellsout.ReflectionDirection = direction + 2 * cos_theta_1*normal;
+	snellsout.ReflectionDirection = direction + 2 * cos_theta_1 * normal;
 	snellsout.ReflectionDirection.normalize();
 	// what about the intensity?
 	
 	return snellsout;
 }
 
-RayTrace RayTracer(Light &light, RayTrace &Interaction, Surface &surface, bool inside)
+void RayTracer(Light *light, RayTrace *Interaction, Surface *surface, bool inside)
 {
 	time_t stop = 0;
 	Contact contact;
-	contact.RayNumber = vector<double>(surface.NumFacets,-1); // initialize with "-1"
-	contact.Vertices = vector<Vector3d>(surface.NumFacets);
+	contact.RayNumber = vector<double>(surface->NumFacets,-1); // initialize with "-1"
+	contact.Vertices = vector<Vector3d>(surface->NumFacets);
 	//contact.BoundaryFacet = vector<Vector3d>(light.RayNumber);
-	contact.Facets = vector<double>(surface.NumFacets, -1);
-	contact.Distance = vector<double>(light.RayNumber);
-	for (int i = 0; i < surface.Normal.size(); ++i)
-		surface.Normal[i].normalize();
+	contact.Facets = vector<double>(surface->NumFacets, -1);
+	contact.Distance = vector<double>(light->RayNumber);
+	for (int i = 0; i < surface->Normal.size(); ++i)
+		surface->Normal[i].normalize();
 
-	for (int ray = 0; ray < light.RayNumber; ++ray)
+	for (int ray = 0; ray < light->RayNumber; ++ray)
 	{
-		light.Direction[ray].normalize();
-		vector<bool> possiblerays = PreProcessing(light.Direction[ray], surface.Normal, inside);
-		for (int j = 0; j < surface.NumFacets; ++j)
+		light->Direction[ray].normalize();
+		vector<bool> possiblerays = PreProcessing(light->Direction[ray], surface, inside);
+		for (int j = 0; j < surface->NumFacets; ++j)
 		{
 			if (!possiblerays[j])
 				continue;
 
-			Vector3d rhs = light.Origin[ray] - surface.Vertices[surface.Facets[j][0] - 1];
+			Vector3d rhs = light->Origin[ray] - surface->Vertices[surface->Facets[j][0] - 1];
 			Matrix3d mat, matx, maty, matz;
-			mat << -light.Direction[ray], surface.Vertices[surface.Facets[j][1] - 1] - surface.Vertices[surface.Facets[j][0] - 1], surface.Vertices[surface.Facets[j][2] - 1] - surface.Vertices[surface.Facets[j][0] - 1];
+			mat << -light->Direction[ray], surface->Vertices[surface->Facets[j][1] - 1] - surface->Vertices[surface->Facets[j][0] - 1], surface->Vertices[surface->Facets[j][2] - 1] - surface->Vertices[surface->Facets[j][0] - 1];
 			/*
 			time_t start = clock();
 			Vector3d res = mat.colPivHouseholderQr().solve(rhs);
@@ -174,9 +174,9 @@ RayTrace RayTracer(Light &light, RayTrace &Interaction, Surface &surface, bool i
 			*/
 
 			// Use Cramer's Rule:
-			matx << rhs, surface.Vertices[surface.Facets[j][1] - 1] - surface.Vertices[surface.Facets[j][0] - 1], surface.Vertices[surface.Facets[j][2] - 1] - surface.Vertices[surface.Facets[j][0] - 1];
-			maty << -light.Direction[ray], rhs, surface.Vertices[surface.Facets[j][2] - 1] - surface.Vertices[surface.Facets[j][0] - 1];
-			matz << -light.Direction[ray], surface.Vertices[surface.Facets[j][1] - 1] - surface.Vertices[surface.Facets[j][0] - 1], rhs;
+			matx << rhs, surface->Vertices[surface->Facets[j][1] - 1] - surface->Vertices[surface->Facets[j][0] - 1], surface->Vertices[surface->Facets[j][2] - 1] - surface->Vertices[surface->Facets[j][0] - 1];
+			maty << -light->Direction[ray], rhs, surface->Vertices[surface->Facets[j][2] - 1] - surface->Vertices[surface->Facets[j][0] - 1];
+			matz << -light->Direction[ray], surface->Vertices[surface->Facets[j][1] - 1] - surface->Vertices[surface->Facets[j][0] - 1], rhs;
 			
 			double det = mat.determinant();
 			double detx = matx.determinant();
@@ -211,30 +211,30 @@ RayTrace RayTracer(Light &light, RayTrace &Interaction, Surface &surface, bool i
 
 			if (contact.Facets[ray] > -1)
 			{
-				//contact.BoundaryFacet[ray] = surface.Facets[j];
+				//contact.BoundaryFacet[ray] = surface->Facets[j];
 				// maybe add a mask like in the Matlab code
 
-				Interaction.Reflection.Origin[ray] = light.Origin[ray] + contact.Distance[ray] * light.Direction[ray];
-				Interaction.Refraction.Origin[ray] = light.Origin[ray] + contact.Distance[ray] * light.Direction[ray];
+				Interaction->Reflection.Origin[ray] = light->Origin[ray] + contact.Distance[ray] * light->Direction[ray];
+				Interaction->Refraction.Origin[ray] = light->Origin[ray] + contact.Distance[ray] * light->Direction[ray];
 
 				snellsLawOutput out;
 				if (inside) // check if light rays originate from within the bottle
 				{
-					out  = snellsLaw( -surface.Normal[contact.Facets[ray]], light.Direction[ray], light.Intensity[ray], 1.33, 1.0 );
+					out  = snellsLaw( -surface->Normal[contact.Facets[ray]], light->Direction[ray], light->Intensity[ray], 1.33, 1.0 );
 				}
 				else
 				{
-					out = snellsLaw(-surface.Normal[contact.Facets[ray]], light.Direction[ray], light.Intensity[ray], 1.0, 1.33);
+					out = snellsLaw(-surface->Normal[contact.Facets[ray]], light->Direction[ray], light->Intensity[ray], 1.0, 1.33);
 				}
-				Interaction.Reflection.Direction[ray] = out.ReflectionDirection;
-				Interaction.Reflection.Intensity[ray] = out.ReflectionIntensity;
+				Interaction->Reflection.Direction[ray] = out.ReflectionDirection;
+				Interaction->Reflection.Intensity[ray] = out.ReflectionIntensity;
 
-				Interaction.Refraction.Direction[ray] = out.RefractionDirection;
-				Interaction.Refraction.Intensity[ray] = out.RefractionIntensity;
+				Interaction->Refraction.Direction[ray] = out.RefractionDirection;
+				Interaction->Refraction.Intensity[ray] = out.RefractionIntensity;
 			}
 			
 		}
 	}
 	mexPrintf("Housholder time: %f \n", (double)(stop) / (double)CLOCKS_PER_SEC);
-	return Interaction;
+	//return Interaction;
 }
