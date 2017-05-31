@@ -18,6 +18,7 @@
 #include <ctime> // ermöglicht timer
 
 #include <Eigen\Eigen> // matrix, vector classes for easy computations
+#include <mex.h>
 
 #include "ImportData.h"
 #include "Structures.h"
@@ -141,6 +142,7 @@ snellsLawOutput snellsLaw(Vector3d normal, Vector3d direction, double intensity,
 
 RayTrace RayTracer(Light &light, RayTrace &Interaction, Surface &surface, bool inside)
 {
+	time_t stop = 0;
 	Contact contact;
 	contact.RayNumber = vector<double>(surface.NumFacets,-1); // initialize with "-1"
 	contact.Vertices = vector<Vector3d>(surface.NumFacets);
@@ -162,20 +164,29 @@ RayTrace RayTracer(Light &light, RayTrace &Interaction, Surface &surface, bool i
 			Vector3d rhs = light.Origin[ray] - surface.Vertices[surface.Facets[j][0] - 1];
 			Matrix3d mat, matx, maty, matz;
 			mat << -light.Direction[ray], surface.Vertices[surface.Facets[j][1] - 1] - surface.Vertices[surface.Facets[j][0] - 1], surface.Vertices[surface.Facets[j][2] - 1] - surface.Vertices[surface.Facets[j][0] - 1];
-			//Vector3d res = mat.colPivHouseholderQr().solve(rhs);
-			//double t = res[0];
-			//double beta = res[1];
-			//double gamma = res[2];
+			/*
+			time_t start = clock();
+			Vector3d res = mat.colPivHouseholderQr().solve(rhs);
+			stop += clock() - start;
+			double t = res[0];
+			double beta = res[1];
+			double gamma = res[2];
+			*/
 
 			// Use Cramer's Rule:
 			matx << rhs, surface.Vertices[surface.Facets[j][1] - 1] - surface.Vertices[surface.Facets[j][0] - 1], surface.Vertices[surface.Facets[j][2] - 1] - surface.Vertices[surface.Facets[j][0] - 1];
 			maty << -light.Direction[ray], rhs, surface.Vertices[surface.Facets[j][2] - 1] - surface.Vertices[surface.Facets[j][0] - 1];
-			matx << -light.Direction[ray], surface.Vertices[surface.Facets[j][1] - 1] - surface.Vertices[surface.Facets[j][0] - 1], rhs;
+			matz << -light.Direction[ray], surface.Vertices[surface.Facets[j][1] - 1] - surface.Vertices[surface.Facets[j][0] - 1], rhs;
 			
 			double det = mat.determinant();
 			double detx = matx.determinant();
 			double dety = maty.determinant();
 			double detz = matz.determinant();
+
+			if (det == 0)
+			{
+				continue;
+			}
 
 			double t = detx / det;
 			double beta = dety / det;
@@ -183,7 +194,8 @@ RayTrace RayTracer(Light &light, RayTrace &Interaction, Surface &surface, bool i
 
 			if ((t > 0) && (beta > 0) && (gamma > 0) && (beta < 1) && (gamma < 1) && (beta + gamma < 1))
 			{
-				if (contact.RayNumber[ray] == -1)
+				
+				if (contact.RayNumber[j] == -1)
 				{
 					contact.RayNumber[j] = ray;
 					contact.Facets[ray] = j;
@@ -218,10 +230,11 @@ RayTrace RayTracer(Light &light, RayTrace &Interaction, Surface &surface, bool i
 				Interaction.Reflection.Intensity[ray] = out.ReflectionIntensity;
 
 				Interaction.Refraction.Direction[ray] = out.RefractionDirection;
-				Interaction.Reflection.Intensity[ray] = out.RefractionIntensity;
+				Interaction.Refraction.Intensity[ray] = out.RefractionIntensity;
 			}
 			
 		}
 	}
+	mexPrintf("Housholder time: %f \n", (double)(stop) / (double)CLOCKS_PER_SEC);
 	return Interaction;
 }

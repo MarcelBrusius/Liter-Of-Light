@@ -150,7 +150,6 @@ using namespace Eigen;
 // ---- Mex Gateway -------------------------------------------------------------------------------
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
-//int main(int argc, char** argv)
 {
 	// ---- Assert input and output count ---------------------------------------------------------
 	if (nrhs != 6)
@@ -288,7 +287,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	}
 	// ---- RayTracing ----------------------------------------------------------------------------
 	// Read Data:
-	/*Light light;
+	/*
+	Light light;
 	Surface surface;
 
 	ImportData im;
@@ -300,7 +300,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	surface.Vertices = im.Import("Data/SurfaceVertex.dat", surface.Vertices);
 	surface.Normal = im.Import("Data/SurfaceNormal.dat", surface.Normal);
 	surface.Facets = im.Import("Data/SurfaceFacets.dat", surface.Facets);
-	surface.NumFacets = surface.Facets.size();*/
+	surface.NumFacets = surface.Facets.size();
+	*/
 
 	RayTrace Interaction;
 	Interaction.Reflection = light;
@@ -312,10 +313,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	Interaction = RayTracer(light, Interaction, surface, false);
 	clock_t end = clock();
 
-	/*cout << "Elapsed time is: " << (end - start) / (double)CLOCKS_PER_SEC << '\n';
+	/*
+	cout << "Elapsed time is: " << (end - start) / (double)CLOCKS_PER_SEC << '\n';
 	cout << "Incoming light intensity: " << sumVector(light.Intensity) << '\n';
 	cout << "Reflected light intensity :" << sumVector(Interaction.Reflection.Intensity) << '\n';
-	cout << "Refracted light intensity :" << sumVector(Interaction.Refraction.Intensity) << '\n';*/
+	cout << "Refracted light intensity :" << sumVector(Interaction.Refraction.Intensity) << '\n';
+	*/
 
 	mexPrintf("Elapsed time is           : %f \n", (double)(end - start) / (double)CLOCKS_PER_SEC);
 	mexPrintf("Incoming light intensity  : %f \n", sumVector(light.Intensity));
@@ -338,8 +341,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 	size_t Size = mxGetNumberOfDimensions(prhs[3]);
 	const mwSize *NumVec = mxGetDimensions(prhs[3]);
-	
-	//mwSize* dims = (mwSize*)mxCalloc(Ps - 1, sizeof(mwSize))
 
 	plhs[0] = mxCreateNumericArray(Size, NumVec, mxDOUBLE_CLASS, mxREAL);
 	RefractionDirection = mxGetPr(plhs[0]);
@@ -370,5 +371,4 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		RefractionIntensity[i] = Interaction.Refraction.Intensity[i];
 		ReflectionIntensity[i] = Interaction.Reflection.Intensity[i];
 	}
-	//return 0;
 }
