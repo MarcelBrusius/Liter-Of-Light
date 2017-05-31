@@ -213,17 +213,20 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	surface.Vertices = vector<Vector3d>((int)VerticesNum[0]);
 	surface.Facets = vector<Vector3d>((int)FacetsNum[0]);
 
+	for (mwSize i = 0; i < VerticesNum[0]; ++i)
+	{
+		for (mwSize j = 0; j < 3; ++j)
+		{
+			surface.Vertices[i][j] = VerticesData[j + 3 * i];
+		}
+	}
+
 	for (mwSize i = 0; i < NormalNum[0]; ++i)
 	{
 		for (mwSize j = 0; j < 3; ++j)
 		{
-mexPrintf("Iteration %i \n", i + 3 * j);
-			//mexPrintf("Facet: %d \n", FacetsData[j + 3 * i]);
 			surface.Normal[i][j] = NormalData[j + 3 * i];
-			surface.Vertices[i][j] = VerticesData[j + 3 * i];
 			surface.Facets[i][j] = FacetsData[j + 3 * i];
-			//mexPrintf("NormalData[%i] = %d \n", i, NormalData[i]);
-			//mexPrintf("Normal[%i] = %d \n", i, surface.Normal[i]);
 		}
 	}
 	// ---- Mex2Eigen Light -----------------------------------------------------------------------
@@ -278,8 +281,8 @@ mexPrintf("Iteration %i \n", i + 3 * j);
 		light.Intensity[i] = IntensityData[i];
 		for (mwSize j = 0; j < 3; ++j)
 		{
-			light.Direction[i][j] = NormalData[j + 3 * i];
-			light.Origin[i][j] = VerticesData[j + 3 * i];
+			light.Direction[i][j] = DirectionData[j + 3 * i];
+			light.Origin[i][j] = OriginData[j + 3 * i];
 			
 		}
 	}
@@ -314,10 +317,10 @@ mexPrintf("Iteration %i \n", i + 3 * j);
 	cout << "Reflected light intensity :" << sumVector(Interaction.Reflection.Intensity) << '\n';
 	cout << "Refracted light intensity :" << sumVector(Interaction.Refraction.Intensity) << '\n';*/
 
-	mexPrintf("Elapsed time is           : %d \n", (double)(end - start) / (double)CLOCKS_PER_SEC);
-	mexPrintf("Incoming light intensity  : %d \n", sumVector(light.Intensity));
-	mexPrintf("Reflected light intensity : %d \n", sumVector(Interaction.Reflection.Intensity));
-	mexPrintf("Refracted light intensity : %d \n", sumVector(Interaction.Refraction.Intensity));
+	mexPrintf("Elapsed time is           : %f \n", (double)(end - start) / (double)CLOCKS_PER_SEC);
+	mexPrintf("Incoming light intensity  : %f \n", sumVector(light.Intensity));
+	mexPrintf("Reflected light intensity : %f \n", sumVector(Interaction.Reflection.Intensity));
+	mexPrintf("Refracted light intensity : %f \n", sumVector(Interaction.Refraction.Intensity));
 
 	// ---- Eigen2Mex -----------------------------------------------------------------------------
 	

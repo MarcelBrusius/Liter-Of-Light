@@ -140,7 +140,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="basicOperations.cpp" />
-    <ClCompile Include="firstProg.cpp" />
     <ClCompile Include="ImportData.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="RayTracer.cpp" />
