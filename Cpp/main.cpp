@@ -27,132 +27,12 @@
 using namespace std;
 using namespace Eigen;
 
-// ---- Mex2Eigen Functions -----------------------------------------------------------------------
-
-//vector<Vector3d> Mex2Vector3d(double *Data, size_t Size, const mwSize *Num)
-//{
-//	if (Size > 2)
-//	{
-//		mexErrMsgTxt("Too many dimensions.");
-//	}
-//	if (Size < 2)
-//	{
-//		mexErrMsgTxt("Not enough dimensions, expected matrix of dimension m by 3.");
-//	}
-//
-//	mwSize ItemSize = Num[1];
-//
-//	if (ItemSize != 3)
-//	{
-//		mexErrMsgTxt("Expected matrix of dimension m by 3.");
-//	}
-//
-//	vector<Vector3d> vec = vector<Vector3d>((int)Num[0]);
-//
-//	for (mwSize i = 0; i < Num[0]; ++i)
-//	{
-//		for (mwSize j = 0; j < 3; ++j)
-//		{
-//			vec[i][j] = Data[i + 3 * j];
-//		}
-//	}
-//
-//	return vec;
-//}
-
-//vector<double> Mex2Double(double *Data, size_t Size, const mwSize *Num)
-//{
-//	if (Size > 2)
-//	{
-//		//mexPrintf("Size = %d", Size);
-//		mexErrMsgTxt("Too many dimensions.");
-//	}
-//	if (Size < 2)
-//	{
-//		mexErrMsgTxt("Not enough dimensions, expected matrix of dimension m by 1.");
-//	}
-//
-//	mwSize ItemSize = Num[1];
-//
-//	if (ItemSize != 1)
-//	{
-//		mexPrintf("ItemSize = %d, Num = [%d,%d].", ItemSize, Num[0], Num[1]);
-//		mexErrMsgTxt("Expected matrix of dimension m by 1.");
-//	}
-//
-//	vector<double> vec = vector<double>((int)Num[0]);
-//
-//	for (mwSize i = 0; i < Num[0]; ++i)
-//	{
-//		vec[i] = Data[i];
-//		mexPrintf("Data[%i] = %d \n", i, Data[i]);
-//		mexPrintf("Vec[%i] = %d \n", i, vec[i]);
-//	}
-//
-//	return vec;
-//}
-
-//Light Mex2Light(const mxArray *Direction, const mxArray *Origin, const mxArray *Intensity)
-//{
-//	Light light;
-//
-//	double *DirectionData = mxGetPr(Direction);
-//	size_t Size = mxGetNumberOfDimensions(Direction);
-//	const mwSize *Num = mxGetDimensions(Direction);
-//
-//	light.Direction = Mex2Vector3d(DirectionData, Size, Num);
-//	light.RayNumber = Num[0];
-//
-//	double *OriginData = mxGetPr(Origin);
-//	Size = mxGetNumberOfDimensions(Origin);
-//	Num = mxGetDimensions(Origin);
-//	
-//	light.Origin = Mex2Vector3d(OriginData, Size, Num);
-//
-//	double *IntensityData = mxGetPr(Intensity);
-//	Size = mxGetNumberOfDimensions(Intensity);
-//	Num = mxGetDimensions(Intensity);
-//
-//	light.Intensity = Mex2Double(IntensityData, Size, Num);
-//
-//
-//	return light;
-//}
-
-//Surface Mex2Surface(const mxArray *Normal, const mxArray *Vertices, const mxArray *Facets)
-//{
-//	Surface surface;
-//
-//	double *NormalData = mxGetPr(Normal);
-//	size_t Size = mxGetNumberOfDimensions(Normal);
-//	const mwSize *Num = mxGetDimensions(Normal);
-//
-//	surface.Normal = Mex2Vector3d(NormalData, Size, Num);
-//
-//	double *VerticesData = mxGetPr(Vertices);
-//	Size = mxGetNumberOfDimensions(Vertices);
-//	Num = mxGetDimensions(Vertices);
-//
-//	surface.Vertices = Mex2Vector3d(VerticesData, Size, Num);
-//
-//	double *FacetsData = mxGetPr(Facets);
-//	Size = mxGetNumberOfDimensions(Facets);
-//	Num = mxGetDimensions(Facets);
-//
-//	surface.Facets = Mex2Vector3d(FacetsData, Size, Num);
-//	surface.NumFacets = Num[0];
-//
-//
-//
-//	return surface;
-//}
-
 // ---- Mex Gateway -------------------------------------------------------------------------------
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
 	// ---- Assert input and output count ---------------------------------------------------------
-	if (nrhs != 6)
+	if (nrhs != 7)
 	{
 		mexErrMsgTxt("Not enough input arguments. \n");
 	}
@@ -170,6 +50,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	// Light Direction
 	// Light Origin
 	// Light Intensity
+	//
+	// inside/outside
 	
 	// ---- Mex2Eigen Surface ---------------------------------------------------------------------
 	//Surface surface = Mex2Surface(prhs[0], prhs[1], prhs[2]);
@@ -230,6 +112,17 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	}
 
 	Surface *surfacePtr = &surface;
+
+	// get boolean specifying inside/outside
+	
+	double *insideData = mxGetPr(prhs[6]);
+	size_t insideSize = mxGetNumberOfDimensions(prhs[6]);
+	const mwSize *insideNum = mxGetDimensions(prhs[6]);
+	if ((insideSize > 2) || (insideNum[0] > 1))
+	{
+		mexErrMsgTxt("Expected boolean value but was given an array.");
+	}
+	bool inside = (bool)&insideData;
 
 	// ---- Mex2Eigen Light -----------------------------------------------------------------------
 	//Light light = Mex2Light(prhs[3], prhs[4], prhs[5]);
@@ -318,15 +211,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 	clock_t start = clock();
 	/*Interaction = */
-	RayTracer(lightPtr, InteractionPtr, surfacePtr, false);
+	RayTracer(lightPtr, InteractionPtr, surfacePtr, inside);
 	clock_t end = clock();
-
-	/*
-	cout << "Elapsed time is: " << (end - start) / (double)CLOCKS_PER_SEC << '\n';
-	cout << "Incoming light intensity: " << sumVector(light.Intensity) << '\n';
-	cout << "Reflected light intensity :" << sumVector(Interaction.Reflection.Intensity) << '\n';
-	cout << "Refracted light intensity :" << sumVector(Interaction.Refraction.Intensity) << '\n';
-	*/
 
 	mexPrintf("Elapsed time is           : %f \n", (double)(end - start) / (double)CLOCKS_PER_SEC);
 	mexPrintf("Incoming light intensity  : %f \n", sumVector(light.Intensity));

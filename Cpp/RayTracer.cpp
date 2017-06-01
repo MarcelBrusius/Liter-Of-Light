@@ -90,7 +90,7 @@ fresnelOutput fresnelEq(double n1, double n2, double c1, double c2)
 	return fresnelout;
 }
 
-snellsLawOutput snellsLaw(Vector3d normal, Vector3d direction, double intensity, double n1, double n2) 
+snellsLawOutput snellsLaw(Vector3d normal, Vector3d direction, double intensity, double n1, double n2)
 {
 	//REFLECTLIGHT Calculate reflection and refraction of a light ray at the bottle surface
 	//   http://www.thefullwiki.org/Snells_law
@@ -111,13 +111,11 @@ snellsLawOutput snellsLaw(Vector3d normal, Vector3d direction, double intensity,
 	normal.normalize();
 	direction.normalize();
 	
-	double cos_theta_1 = normal.dot(direction);
+	double cos_theta_1 = normal.dot(-direction);
 	double cos_theta_2 = sqrt(1 - pow((n1 / n2), 2) * (1 - pow(cos_theta_1, 2)));
 
 	if (1 - pow((n1 / n2), 2) * (1 - pow(cos_theta_1, 2)) > 0)
 	{  // check for total reflection
-		
-
 		// Methode 1: Assume plastic doesn't change intensities
 		fresnelOutput fresnelout = fresnelEq(n1, n2, cos_theta_1, cos_theta_2);
 		
@@ -164,14 +162,6 @@ void RayTracer(Light *light, RayTrace *Interaction, Surface *surface, bool insid
 			Vector3d rhs = light->Origin[ray] - surface->Vertices[surface->Facets[j][0] - 1];
 			Matrix3d mat, matx, maty, matz;
 			mat << -light->Direction[ray], surface->Vertices[surface->Facets[j][1] - 1] - surface->Vertices[surface->Facets[j][0] - 1], surface->Vertices[surface->Facets[j][2] - 1] - surface->Vertices[surface->Facets[j][0] - 1];
-			/*
-			time_t start = clock();
-			Vector3d res = mat.colPivHouseholderQr().solve(rhs);
-			stop += clock() - start;
-			double t = res[0];
-			double beta = res[1];
-			double gamma = res[2];
-			*/
 
 			// Use Cramer's Rule:
 			matx << rhs, surface->Vertices[surface->Facets[j][1] - 1] - surface->Vertices[surface->Facets[j][0] - 1], surface->Vertices[surface->Facets[j][2] - 1] - surface->Vertices[surface->Facets[j][0] - 1];
@@ -224,7 +214,7 @@ void RayTracer(Light *light, RayTrace *Interaction, Surface *surface, bool insid
 				}
 				else
 				{
-					out = snellsLaw(-surface->Normal[contact.Facets[ray]], light->Direction[ray], light->Intensity[ray], 1.0, 1.33);
+					out = snellsLaw(surface->Normal[contact.Facets[ray]], light->Direction[ray], light->Intensity[ray], 1.0, 1.33);
 				}
 				Interaction->Reflection.Direction[ray] = out.ReflectionDirection;
 				Interaction->Reflection.Intensity[ray] = out.ReflectionIntensity;
@@ -235,6 +225,4 @@ void RayTracer(Light *light, RayTrace *Interaction, Surface *surface, bool insid
 			
 		}
 	}
-	mexPrintf("Housholder time: %f \n", (double)(stop) / (double)CLOCKS_PER_SEC);
-	//return Interaction;
 }
