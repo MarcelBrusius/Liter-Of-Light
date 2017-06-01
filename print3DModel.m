@@ -1,3 +1,4 @@
+
 clear
 close all;
 tic
@@ -20,7 +21,7 @@ BottleIntensityVec = zeros(length(above_roof_vec),length(IncidenceAngleVec));
 RelativeIntensity = BottleIntensityVec;
 
 %number of sun rays
-n_rays=20;
+n_rays=100;
 
 init = struct;
 Surface = createSurface(vert);
@@ -43,9 +44,12 @@ for i = 1:length(above_roof_vec)
 
         Light = createLight(Direction,Origin);
         Light.Intensity=repmat(Intensity,[n_rays,1]);
-
-        [R,T] = RayTrace(Surface,Light);  % R represents the rays that are transmitted, T the light rays that are reflected, (but the implementation is correct i think)
-
+% tic
+        [R.Direction, R.Origin, R.Intensity, T.Direction, T.Origin, T.Intensity] = ...
+            LiterofLight(Surface.Normal, Surface.Vertices, Surface.BoundaryFacets, ...
+            Light.Direction, Light.Origin, Light.Intensity, false);
+%         [R,T] = RayTrace(Surface,Light);  % R represents the rays that are transmitted, T the light rays that are reflected, (but the implementation is correct i think)
+% toc
         % ignore rays that are below the "imaginary roof"
         R.Direction = R.Direction(R.Origin(:,3)>above_roof,:);
         T.Direction = T.Direction(T.Origin(:,3)>above_roof,:);
@@ -69,10 +73,10 @@ for i = 1:length(above_roof_vec)
         
         
         OnBottleVec(i,j)=sum(R.Intensity)+sum(T.Intensity);
-        disp(['Radient flux on bottle surface: ',num2str(OnBottleVec(i,j))])
+%         disp(['Radient flux on bottle surface: ',num2str(OnBottleVec(i,j))])
         InBottleVec(i,j)=sum(R.Intensity);
-        disp(['Radient flux transmitted into the bottle: ', ...
-            num2str(InBottleVec(i,j))])
+%         disp(['Radient flux transmitted into the bottle: ', ...
+%             num2str(InBottleVec(i,j))])
         
         intensity = 0;
         
@@ -80,7 +84,10 @@ for i = 1:length(above_roof_vec)
 
         BottleIntensity=0;
         for k = 2:height
-            [T,R] = RayTrace(Surface,R);
+            [T.Direction, T.Origin, T.Intensity, R.Direction, R.Origin, R.Intensity] = ...
+            LiterofLight(Surface.Normal, Surface.Vertices, Surface.BoundaryFacets, ...
+            Light.Direction, Light.Origin, Light.Intensity, true);
+%             [T,R] = RayTrace(Surface,R);
 
             %ignore rays hitting the bottle cap
             R.Direction = R.Direction(R.Origin(:,3)<28.1,:);
@@ -107,16 +114,16 @@ for i = 1:length(above_roof_vec)
             BottleIntensity=BottleIntensity + sum(T.Intensity);
             C{i,j,k} = T;
 
-            disp(['Radient flux emitted from bottle under the roof: ', ...
-                num2str(sum(T.Intensity))]);
+%             disp(['Radient flux emitted from bottle under the roof: ', ...
+%                 num2str(sum(T.Intensity))]);
         end
         x = (i-1)*length(IncidenceAngleVec);
         waitbar((x+j)/iter,h,['Calculating...', ...
             num2str(round(100*((i-1)*length(IncidenceAngleVec)+j)/iter)), '%']);
 
         BottleIntensityVec(i,j)=BottleIntensity;
-        disp(['Total radient flux emitted from bottle under the roof: ', ...
-            num2str(BottleIntensity)])
+%         disp(['Total radient flux emitted from bottle under the roof: ', ...
+%             num2str(BottleIntensity)])
         
         RelativeIntensity(i,j) = BottleIntensityVec(i,j)/sum(C{i,j,1}.Intensity);
     end
@@ -127,7 +134,7 @@ clear('vert');
 
 toc
 
-[row, col] = find(RelativeIntensity == max(max(RelativeIntensity)));
+[row, col] = find(BottleIntensityVec == max(max(BottleIntensityVec)));
 
 
 disp(['            Initial intensity : ', num2str(sum(C{row,col,1}.Intensity))]);
@@ -135,21 +142,17 @@ disp(['Resulting intensity (maximal) : ', num2str(BottleIntensityVec(row,col))])
 disp(['         Efficiency (maximal) : ', num2str(RelativeIntensity(row,col)/...
     sum(C{row,col,1}.Intensity))]);
 
-
-% resizes the output windows
-G.ZLim = [-10, 40];
-G.XLim = [-15, 15];
-G.YLim = [-15, 15];
-
-
-
 % Print results only if requested ( printresults == 1 ):
 % printresults = 0;
 printresults = chooseDialog;
 
 if printresults
-    F = figure(1);
+    % resizes the output windows
     G = gca;
+    G.ZLim = [-10, 40];
+    G.XLim = [-15, 15];
+    G.YLim = [-15, 15];
+    F = figure(1);
     plot(Surface.Bottle,'FaceAlpha',0.2,'FaceLighting','gouraud','BackFaceLighting','unlit');
     for i = 1:height
         hold on;
@@ -158,6 +161,5 @@ if printresults
     % forces 3D view
     view(3)
 end
-
 
 hold off;
