@@ -60,14 +60,17 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	Surface surface;
 
 	double *NormalData = mxGetPr(prhs[0]);
+	size_t NormalRow = mxGetM(prhs[0]), NormalCol = mxGetN(prhs[0]);
 	size_t NormalSize = mxGetNumberOfDimensions(prhs[0]);
 	const mwSize *NormalNum = mxGetDimensions(prhs[0]);
 
 	double *VerticesData = mxGetPr(prhs[1]);
+	size_t VerticesRow = mxGetM(prhs[1]), VerticesCol = mxGetN(prhs[1]);
 	size_t VerticesSize = mxGetNumberOfDimensions(prhs[1]);
 	const mwSize *VerticesNum = mxGetDimensions(prhs[1]);
 
 	double *FacetsData = mxGetPr(prhs[2]);
+	size_t FacetsRow = mxGetM(prhs[2]), FacetsCol = mxGetN(prhs[2]);
 	size_t FacetsSize = mxGetNumberOfDimensions(prhs[2]);
 	const mwSize *FacetsNum = mxGetDimensions(prhs[2]);
 
@@ -90,20 +93,20 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	surface.Vertices = vector<Vector3d>((int)VerticesNum[0]);
 	surface.Facets = vector<Vector3d>((int)FacetsNum[0]);
 
-	for (mwSize i = 0; i < VerticesNum[0]; ++i)
+	for (mwSize i = 0; i < VerticesRow; ++i)
 	{
-		for (mwSize j = 0; j < 3; ++j)
+		for (mwSize j = 0; j < VerticesCol; ++j)
 		{
-			surface.Vertices[i][j] = VerticesData[j + 3 * i];
+			surface.Vertices[i][j] = VerticesData[j*VerticesRow + i];
 		}
 	}
 
-	for (mwSize i = 0; i < NormalNum[0]; ++i)
+	for (mwSize i = 0; i < NormalRow; ++i)
 	{
-		for (mwSize j = 0; j < 3; ++j)
+		for (mwSize j = 0; j < NormalCol; ++j)
 		{
-			surface.Normal[i][j] = NormalData[j + 3 * i];
-			surface.Facets[i][j] = FacetsData[j + 3 * i];
+			surface.Normal[i][j] = NormalData[j*NormalRow + i];
+			surface.Facets[i][j] = FacetsData[j*NormalRow + i];
 		}
 	}
 
@@ -125,14 +128,17 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	Light light;
 
 	double *DirectionData = mxGetPr(prhs[3]);
+	size_t DirectionRow = mxGetM(prhs[3]), DirectionCol = mxGetN(prhs[3]);
 	size_t DirectionSize = mxGetNumberOfDimensions(prhs[3]);
 	const mwSize *DirectionNum = mxGetDimensions(prhs[3]);
 
 	double *OriginData = mxGetPr(prhs[4]);
+	size_t OriginRow = mxGetM(prhs[4]), OriginCol = mxGetN(prhs[4]);
 	size_t OriginSize = mxGetNumberOfDimensions(prhs[4]);
 	const mwSize *OriginNum = mxGetDimensions(prhs[4]);
 
 	double *IntensityData = mxGetPr(prhs[5]);
+	size_t IntensityRow = mxGetM(prhs[5]), IntensityCol = mxGetN(prhs[5]);
 	size_t IntensitySize = mxGetNumberOfDimensions(prhs[5]);
 	const mwSize *IntensityNum = mxGetDimensions(prhs[5]);
 
@@ -165,13 +171,13 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	light.Direction = vector<Vector3d>((int)DirectionNum[0]);
 	light.Origin = vector<Vector3d>((int)OriginNum[0]);
 	light.Intensity = vector<double>((int)IntensityNum[0]);
-	for (mwSize i = 0; i < DirectionNum[0]; ++i)
+	for (mwSize i = 0; i < DirectionRow; ++i)
 	{
 		light.Intensity[i] = IntensityData[i];
-		for (mwSize j = 0; j < 3; ++j)
+		for (mwSize j = 0; j < DirectionCol; ++j)
 		{
-			light.Direction[i][j] = DirectionData[j + 3 * i];
-			light.Origin[i][j] = OriginData[j + 3 * i];
+			light.Direction[i][j] = DirectionData[j*DirectionRow + i];
+			light.Origin[i][j] = OriginData[j*DirectionRow + i];
 			
 		}
 	}
@@ -204,9 +210,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	clock_t end = clock();
 
 	mexPrintf("Elapsed time is           : %f \n", (double)(end - start) / (double)CLOCKS_PER_SEC);
-	mexPrintf("Incoming light intensity  : %f \n", sumVector(light.Intensity));
-	mexPrintf("Reflected light intensity : %f \n", sumVector(Reflection.Intensity));
-	mexPrintf("Refracted light intensity : %f \n", sumVector(Refraction.Intensity));
+	//mexPrintf("Incoming light intensity  : %f \n", sumVector(light.Intensity));
+	//mexPrintf("Reflected light intensity : %f \n", sumVector(Reflection.Intensity));
+	//mexPrintf("Refracted light intensity : %f \n", sumVector(Refraction.Intensity));
 
 	// ---- Eigen2Mex -----------------------------------------------------------------------------
 	
@@ -244,12 +250,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 	for (mwSize i = 0; i < NumVec[0]; ++i)
 	{
-		for (mwSize j = 0; j < 3; ++j)
+		for (mwSize j = 0; j < NumVec[1]; ++j)
 		{
-			RefractionDirection[j + 3 * i] = Refraction.Direction[i][j];
-			RefractionOrigin[j + 3 * i] = Refraction.Origin[i][j];
-			ReflectionDirection[j + 3 * i] = Reflection.Direction[i][j];
-			ReflectionOrigin[j + 3 * i] = Reflection.Origin[i][j];
+			RefractionDirection[i + NumVec[0] * j] = Refraction.Direction[i][j];
+			RefractionOrigin[i + NumVec[0] * j] = Refraction.Origin[i][j];
+			ReflectionDirection[i + NumVec[0] * j] = Reflection.Direction[i][j];
+			ReflectionOrigin[i + NumVec[0] * j] = Reflection.Origin[i][j];
 		}
 		RefractionIntensity[i] = Refraction.Intensity[i];
 		ReflectionIntensity[i] = Reflection.Intensity[i];

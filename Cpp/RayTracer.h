@@ -31,7 +31,7 @@ using namespace Eigen;
 
 // ---------------------------- declaration ----------------------------------
 
-void fresnelEq(double n1, double n2, double c1, double c2, Light *Reflection, Light *Refraction, Light *light, int raynumber);
+void Fresnel(double n1, double n2, double c1, double c2, Light *Reflection, Light *Refraction, Light *light, int raynumber);
 
 void snellsLaw(Vector3d normal, Light *Reflection, Light *Refraction, Light *light, double n1, double n2, int raynumber);
 

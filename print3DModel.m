@@ -12,7 +12,7 @@ vert = 0.5*loaded.vert;
 
 
 % Initialize some data vectors for later analysis
-above_roof_vec=0:1:28; % choose numbers in [0,29]
+above_roof_vec=0:1:29; % choose numbers in [0,29]
 IncidenceAngleVec = 180/pi*acos([0.197,0.424,0.627,0.792,0.908,0.968,0.966, ...
     0.904,0.785,0.618,0.413,0.186]); %Values for Venezuela (Caracas), June 16th 2017, [7,...,18] o'clock
 InBottleVec = zeros(length(above_roof_vec),length(IncidenceAngleVec));
@@ -21,7 +21,7 @@ BottleIntensityVec = zeros(length(above_roof_vec),length(IncidenceAngleVec));
 RelativeIntensity = BottleIntensityVec;
 
 %number of sun rays
-n_rays=100;
+n_rays=1000;
 
 init = struct;
 Surface = createSurface(vert);

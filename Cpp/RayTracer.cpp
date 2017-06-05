@@ -9,13 +9,11 @@
 #include <numeric>
 #include <cmath>
 #include <vector> // vector<class> template
-#include <iostream> // input, output interaction via console
 #include <fstream> // file interactions
 #include <sstream>
 #include <string>
 #include <stdlib.h> // string to double conversion
 #include <ctime> // ermöglicht timer
-//#include <iterator>
 
 #include <Eigen\Eigen> // matrix, vector classes for easy computations
 #include <mex.h>
@@ -31,7 +29,7 @@ using namespace Eigen;
 
 // ------------------------ functions --------------------------------
 
-void fresnelEq(double n1, double n2, double c1, double c2, Light *Reflection, Light *Refraction, Light *light, int raynumber ) 
+void Fresnel(double n1, double n2, double c1, double c2, Light *Reflection, Light *Refraction, Light *light, int raynumber ) 
 {
 	//FRESNEL computes the rate of reflection R and the rate of transmission T when light moves
 	//        from medium M1 into medium M2, using the fresnel equations.
@@ -79,14 +77,14 @@ void snellsLaw(Vector3d normal, Light *Reflection, Light *Refraction, Light *lig
 	light->Direction[raynumber].normalize();
 	
 	double cos_theta_1 = normal.dot(-light->Direction[raynumber]);
-	double cos_theta_2 = sqrt(1 - pow((n1 / n2), 2) * (1 - pow(cos_theta_1, 2)));
-
+	double tmp = 1 - pow((n1 / n2), 2) * (1 - pow(cos_theta_1, 2));
 	// check for total reflection
-	if (1 - pow((n1 / n2), 2) * (1 - pow(cos_theta_1, 2)) > 0)
+	if (tmp >= 0)
 	{
+		double cos_theta_2 = sqrt(tmp);
 		// Methode 1: Assume plastic doesn't change intensities
 
-		fresnelEq(n1, n2, cos_theta_1, cos_theta_2, Reflection, Refraction, light, raynumber);
+		Fresnel(n1, n2, cos_theta_1, cos_theta_2, Reflection, Refraction, light, raynumber);
 		if (cos_theta_1 >= 0)
 		{
 			Refraction->Direction[raynumber] = (n1 / n2) * light->Direction[raynumber] + ((n1 / n2) * cos_theta_1 - cos_theta_2) * normal;
