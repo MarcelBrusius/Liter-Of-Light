@@ -1,7 +1,7 @@
 /*
 * Structures.h
 *
-*  Updated on: 29.05.2017
+*  Updated on: 05.06.2017
 *      Author: Marcel Brusius
 *			   University of Kaiserslautern
 */
@@ -44,26 +44,6 @@ struct Contact
 	vector<double> Facets;
 	//vector<Vector3d> BoundaryFacet;
 	vector<double> Distance;
-};
-
-struct fresnelOutput
-{
-	double ReflectionRate;
-	double RefractionRate;
-};
-
-struct snellsLawOutput
-{
-	Vector3d ReflectionDirection;
-	Vector3d RefractionDirection;
-	double ReflectionIntensity;
-	double RefractionIntensity;
-};
-
-struct RayTrace
-{
-	Light Refraction;
-	Light Reflection;
 };
 
 #endif // !STRUCTURE_H
