@@ -12,7 +12,7 @@ vert = 0.5*loaded.vert;
 
 
 % Initialize some data vectors for later analysis
-above_roof_vec=0:7:28; % choose numbers in [0,29]
+above_roof_vec=0:1:28; % choose numbers in [0,29]
 IncidenceAngleVec = 180/pi*acos([0.197,0.424,0.627,0.792,0.908,0.968,0.966, ...
     0.904,0.785,0.618,0.413,0.186]); %Values for Venezuela (Caracas), June 16th 2017, [7,...,18] o'clock
 InBottleVec = zeros(length(above_roof_vec),length(IncidenceAngleVec));
@@ -26,6 +26,7 @@ n_rays=100;
 init = struct;
 Surface = createSurface(vert);
 
+EPS = 0.01;
 
 % nice visualization of progess
 h = waitbar(0,['Calculating...', num2str(0), '%']);
@@ -34,6 +35,9 @@ height = 10; % number of iterations of refraction/reflection
 C = cell(length(above_roof_vec),length(IncidenceAngleVec),height);
 iter = length(above_roof_vec)*length(IncidenceAngleVec);
 
+% F = figure(1);
+% plot(Surface.Bottle,'FaceAlpha',0.2,'FaceLighting','gouraud','BackFaceLighting','unlit');
+% hold on
 for i = 1:length(above_roof_vec)
     above_roof=above_roof_vec(i);
     for j=1:length(IncidenceAngleVec) %elevation angle,i.e. incidence angle w.r.t. the horizontal
@@ -81,12 +85,16 @@ for i = 1:length(above_roof_vec)
         intensity = 0;
         
         C{i,j,1} = R;
+%         printRays(R,7,'b');
 
-        BottleIntensity=0;
+        BottleIntensity=OnBottleVec(i,j);
         for k = 2:height
+            if sum(R.Intensity) < EPS
+                break;
+            end
             [T.Direction, T.Origin, T.Intensity, R.Direction, R.Origin, R.Intensity] = ...
             LiterofLight(Surface.Normal, Surface.Vertices, Surface.BoundaryFacets, ...
-            Light.Direction, Light.Origin, Light.Intensity, true);
+            R.Direction, R.Origin, R.Intensity, true);
 %             [T,R] = RayTrace(Surface,R);
 
             %ignore rays hitting the bottle cap
@@ -113,6 +121,7 @@ for i = 1:length(above_roof_vec)
             
             BottleIntensity=BottleIntensity + sum(T.Intensity);
             C{i,j,k} = T;
+%             printRays(T,10,'b');
 
 %             disp(['Radient flux emitted from bottle under the roof: ', ...
 %                 num2str(sum(T.Intensity))]);
@@ -124,8 +133,6 @@ for i = 1:length(above_roof_vec)
         BottleIntensityVec(i,j)=BottleIntensity;
 %         disp(['Total radient flux emitted from bottle under the roof: ', ...
 %             num2str(BottleIntensity)])
-        
-        RelativeIntensity(i,j) = BottleIntensityVec(i,j)/sum(C{i,j,1}.Intensity);
     end
 end
 close(h)
@@ -139,12 +146,14 @@ toc
 
 disp(['            Initial intensity : ', num2str(sum(C{row,col,1}.Intensity))]);
 disp(['Resulting intensity (maximal) : ', num2str(BottleIntensityVec(row,col))]);
-disp(['         Efficiency (maximal) : ', num2str(RelativeIntensity(row,col)/...
+disp(['         Efficiency (maximal) : ', num2str(BottleIntensityVec(row,col)/...
     sum(C{row,col,1}.Intensity))]);
 
 % Print results only if requested ( printresults == 1 ):
 % printresults = 0;
 printresults = chooseDialog;
+
+x = ['b'; 'r'; 'g'; 'k'; 'm'; 'c'];
 
 if printresults
     % resizes the output windows
@@ -154,9 +163,11 @@ if printresults
     G.YLim = [-15, 15];
     F = figure(1);
     plot(Surface.Bottle,'FaceAlpha',0.2,'FaceLighting','gouraud','BackFaceLighting','unlit');
-    for i = 1:height
+    hold on;
+    printRays(Light,10,'y');
+    for i = 1:6
         hold on;
-        printRays(C{row,col,i},10,'b-');
+        printRays(C{row,col,i},10,x(i));
     end
     % forces 3D view
     view(3)

@@ -1,7 +1,7 @@
 /*
 * main.cpp
 *
-*  Updated on: 29.05.2017
+*  Updated on: 05.06.2017
 *      Author: Marcel Brusius
 *			   University of Kaiserslautern
 */
@@ -42,6 +42,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	}
 
 	// ---- Mex2Eigen -----------------------------------------------------------------------------
+
 	//		IN:
 	// Surface Normal
 	// Surface Vertices
@@ -54,6 +55,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	// inside/outside
 	
 	// ---- Mex2Eigen Surface ---------------------------------------------------------------------
+
 	//Surface surface = Mex2Surface(prhs[0], prhs[1], prhs[2]);
 	Surface surface;
 
@@ -61,19 +63,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	size_t NormalSize = mxGetNumberOfDimensions(prhs[0]);
 	const mwSize *NormalNum = mxGetDimensions(prhs[0]);
 
-	//surface.Normal = Mex2Vector3d(NormalData, NormalSize, NormalNum);
-
 	double *VerticesData = mxGetPr(prhs[1]);
 	size_t VerticesSize = mxGetNumberOfDimensions(prhs[1]);
 	const mwSize *VerticesNum = mxGetDimensions(prhs[1]);
-
-	//surface.Vertices = Mex2Vector3d(VerticesData, VerticesSize, VerticesNum);
 
 	double *FacetsData = mxGetPr(prhs[2]);
 	size_t FacetsSize = mxGetNumberOfDimensions(prhs[2]);
 	const mwSize *FacetsNum = mxGetDimensions(prhs[2]);
 
-	//surface.Facets = Mex2Vector3d(FacetsData, FacetsSize, FacetsNum);
 	surface.NumFacets = NormalNum[0];
 
 	if ((NormalSize > 2) || (VerticesSize > 2) || (FacetsSize > 2))
@@ -84,7 +81,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	{
 		mexErrMsgTxt("Not enough dimensions, expected matrix of dimension m by 3. \n");
 	}
-
 	if ((NormalNum[1] != 3) || (VerticesNum[1] != 3) || (FacetsNum[1] != 3))
 	{
 		mexErrMsgTxt("Expected matrix of dimension m by 3. \n");
@@ -125,20 +121,16 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	bool inside = (bool)&insideData;
 
 	// ---- Mex2Eigen Light -----------------------------------------------------------------------
-	//Light light = Mex2Light(prhs[3], prhs[4], prhs[5]);
+
 	Light light;
 
 	double *DirectionData = mxGetPr(prhs[3]);
 	size_t DirectionSize = mxGetNumberOfDimensions(prhs[3]);
 	const mwSize *DirectionNum = mxGetDimensions(prhs[3]);
 
-	//light.Direction = Mex2Vector3d(DirectionData, DirectionSize, DirectionNum);
-
 	double *OriginData = mxGetPr(prhs[4]);
 	size_t OriginSize = mxGetNumberOfDimensions(prhs[4]);
 	const mwSize *OriginNum = mxGetDimensions(prhs[4]);
-
-	//light.Origin = Mex2Vector3d(OriginData, OriginSize, OriginNum);
 
 	double *IntensityData = mxGetPr(prhs[5]);
 	size_t IntensitySize = mxGetNumberOfDimensions(prhs[5]);
@@ -146,7 +138,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 	Light *lightPtr = &light;
 
-	//light.Intensity = Mex2Vector3d(IntensityData, IntensitySize, IntensityNum);
 	light.RayNumber = DirectionNum[0];
 
 	if ((DirectionSize > 2) || (OriginSize > 2) || (IntensitySize > 2))
@@ -202,22 +193,20 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	surface.NumFacets = surface.Facets.size();
 	*/
 
-	RayTrace Interaction;
-	Interaction.Reflection = light;
-	Interaction.Reflection.Intensity = vector<double>(light.RayNumber,0);
-	Interaction.Refraction = light;
-	Interaction.Refraction.Intensity = vector<double>(light.RayNumber,0);
-	RayTrace *InteractionPtr = &Interaction;
+	Light Reflection = light;
+	Reflection.Intensity = vector<double>(light.RayNumber,0);
+	Light Refraction = light;
+	Refraction.Intensity = vector<double>(light.RayNumber,0);
+	Light *Refract = &Refraction, *Reflect = &Reflection;
 
 	clock_t start = clock();
-	/*Interaction = */
-	RayTracer(lightPtr, InteractionPtr, surfacePtr, inside);
+	RayTracer(lightPtr, Reflect, Refract, surfacePtr, inside);
 	clock_t end = clock();
 
 	mexPrintf("Elapsed time is           : %f \n", (double)(end - start) / (double)CLOCKS_PER_SEC);
 	mexPrintf("Incoming light intensity  : %f \n", sumVector(light.Intensity));
-	mexPrintf("Reflected light intensity : %f \n", sumVector(Interaction.Reflection.Intensity));
-	mexPrintf("Refracted light intensity : %f \n", sumVector(Interaction.Refraction.Intensity));
+	mexPrintf("Reflected light intensity : %f \n", sumVector(Reflection.Intensity));
+	mexPrintf("Refracted light intensity : %f \n", sumVector(Refraction.Intensity));
 
 	// ---- Eigen2Mex -----------------------------------------------------------------------------
 	
@@ -257,12 +246,12 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	{
 		for (mwSize j = 0; j < 3; ++j)
 		{
-			RefractionDirection[j + 3 * i] = Interaction.Refraction.Direction[i][j];
-			RefractionOrigin[j + 3 * i] = Interaction.Refraction.Origin[i][j];
-			ReflectionDirection[j + 3 * i] = Interaction.Reflection.Direction[i][j];
-			ReflectionOrigin[j + 3 * i] = Interaction.Reflection.Origin[i][j];
+			RefractionDirection[j + 3 * i] = Refraction.Direction[i][j];
+			RefractionOrigin[j + 3 * i] = Refraction.Origin[i][j];
+			ReflectionDirection[j + 3 * i] = Reflection.Direction[i][j];
+			ReflectionOrigin[j + 3 * i] = Reflection.Origin[i][j];
 		}
-		RefractionIntensity[i] = Interaction.Refraction.Intensity[i];
-		ReflectionIntensity[i] = Interaction.Reflection.Intensity[i];
+		RefractionIntensity[i] = Refraction.Intensity[i];
+		ReflectionIntensity[i] = Reflection.Intensity[i];
 	}
 }
