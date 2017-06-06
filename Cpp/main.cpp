@@ -31,6 +31,7 @@ using namespace Eigen;
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
+	clock_t start = clock();
 	// ---- Assert input and output count ---------------------------------------------------------
 	if (nrhs != 7)
 	{
@@ -205,11 +206,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	Refraction.Intensity = vector<double>(light.RayNumber,0);
 	Light *Refract = &Refraction, *Reflect = &Reflection;
 
-	clock_t start = clock();
 	RayTracer(lightPtr, Reflect, Refract, surfacePtr, inside);
-	clock_t end = clock();
-
-	mexPrintf("Elapsed time is           : %f \n", (double)(end - start) / (double)CLOCKS_PER_SEC);
+	
 	//mexPrintf("Incoming light intensity  : %f \n", sumVector(light.Intensity));
 	//mexPrintf("Reflected light intensity : %f \n", sumVector(Reflection.Intensity));
 	//mexPrintf("Refracted light intensity : %f \n", sumVector(Refraction.Intensity));
@@ -260,4 +258,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		RefractionIntensity[i] = Refraction.Intensity[i];
 		ReflectionIntensity[i] = Reflection.Intensity[i];
 	}
+	clock_t end = clock();
+
+	mexPrintf("Elapsed time is           : %f \n", (double)(end - start) / (double)CLOCKS_PER_SEC);
+	return;
 }
