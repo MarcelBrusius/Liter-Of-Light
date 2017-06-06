@@ -17,16 +17,16 @@ During daytime this design performs like a light bulb and delivers light equival
 + Model light rays
 + Compute refraction and reflection direction on surface
 + Model outgoing light rays
-
-### In progress:
++ Port main routines to C++ for increase of performance
++ Optimize performance
 + Model light intesity for incoming rays
 + Compute light intensity for outgoing rays
-+ Port main routines to C++ for increase of performance
+
+### In progress:
++ Verify the claims/aims stated above
 + Bug fixing
-+ Optimize performance
 
 ### Future:
-+ Verify the claims/aims stated above
 + Using other representations of the surface, e.g. NURBs
     + Model other shapes
     + Generalize computations

@@ -1,7 +1,7 @@
 /*
 * Structures.cpp
 *
-*  Updated on: 29.05.2017
+*  Updated on: 05.06.2017
 *      Author: Marcel Brusius
 *			   University of Kaiserslautern
 */
@@ -22,9 +22,3 @@ struct Light light;
 struct Surface surface;
 
 struct Contact contact;
-
-struct fresnelOutput fresneloutput;
-
-struct snellsLawOutput snellslawoutput;
-
-struct RayTrace raytrace;

@@ -127,7 +127,8 @@
       <AdditionalIncludeDirectories>$(EIGEN_DIR);$(SolutionDir)\include;$(MATLAB_DIR)\extern\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(SolutionDir)\lib;$(SolutionDir);$(MATLAB_DIR)\extern\lib\win64\microsoft</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)\lib;$(MATLAB_DIR)\extern\lib\win64\microsoft;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libut.lib;libmx.lib;libmex.lib;libmat.lib;freeglut.lib;glew32.lib;glew32s.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -135,7 +136,8 @@
       <AdditionalIncludeDirectories>$(EIGEN_DIR);$(SolutionDir)\include;$(MATLAB_DIR)\extern\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(SolutionDir)\lib;$(SolutionDir);$(MATLAB_DIR)\extern\lib\win64\microsoft</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)\lib;$(MATLAB_DIR)\extern\lib\win64\microsoft;</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libut.lib;libmx.lib;libmex.lib;libmat.lib;freeglut.lib;glew32.lib;glew32s.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
