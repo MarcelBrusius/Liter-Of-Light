@@ -123,7 +123,6 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		mexErrMsgTxt("Expected boolean value but was given an array.");
 	}
 	(bool)inside;//  = (bool)&insideData;
-	mexPrintf("Inside: %d", inside);
 
 	// ---- Mex2Eigen Light -----------------------------------------------------------------------
 
