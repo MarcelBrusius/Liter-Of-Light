@@ -115,14 +115,15 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 	// get boolean specifying inside/outside
 	
-	double *insideData = mxGetPr(prhs[6]);
+	double inside = mxGetScalar(prhs[6]);
 	size_t insideSize = mxGetNumberOfDimensions(prhs[6]);
 	const mwSize *insideNum = mxGetDimensions(prhs[6]);
 	if ((insideSize > 2) || (insideNum[0] > 1))
 	{
 		mexErrMsgTxt("Expected boolean value but was given an array.");
 	}
-	bool inside = (bool)&insideData;
+	(bool)inside;//  = (bool)&insideData;
+	mexPrintf("Inside: %d", inside);
 
 	// ---- Mex2Eigen Light -----------------------------------------------------------------------
 
