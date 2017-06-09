@@ -146,9 +146,9 @@ void RayTracer(Light *light, Light *Reflection, Light *Refraction, Surface *surf
 		{
 			// better "preprocessing" than actual preprocessing (no additional loop):
 			surface->Normal[j].normalize();
-			if ((light->Direction[ray].dot(surface->Normal[j]) > 0) && (inside))
+			if ((light->Direction[ray].dot(surface->Normal[j]) < 0) && (inside))
 				continue;
-			if ((light->Direction[ray].dot(surface->Normal[j]) < 0) && (!inside))
+			if ((light->Direction[ray].dot(surface->Normal[j]) > 0) && (!inside))
 				continue;
 
 			Vector3d rhs = light->Origin[ray] - surface->Vertices[surface->Facets[j][0] - 1];
