@@ -14,7 +14,7 @@ rng(20);  % fix seed (helpful for testing)
 
 % Initialize some data vectors for later analysis
 above_roof_vec=13; % choose numbers in [0,29]
-IncidenceAngleVec = 180/pi*acos(0.627);
+IncidenceAngleVec = 180/pi*acos(0.968);
 %IncidenceAngleVec = 180/pi*acos([0.197,0.424,0.627,0.792,0.908,0.968,0.966, ...
 %    0.904,0.785,0.618,0.413,0.186]); %Values for Venezuela (Caracas), June 16th 2017, [7,...,18] o'clock
 InBottleVec = zeros(length(above_roof_vec),length(IncidenceAngleVec));
@@ -50,10 +50,10 @@ for i = 1:length(above_roof_vec)
         C{i,j,1} = Light;
 
 % tic
-%        [R.Direction, R.Origin, R.Intensity, T.Direction, T.Origin, T.Intensity] = ...
-%            LiterofLight(Surface.Normal, Surface.Vertices, Surface.BoundaryFacets, ...
-%            Light.Direction, Light.Origin, Light.Intensity, false);
-         [R,T] = RayTrace(Surface,Light);  % R represents the rays that are transmitted, T the light rays that are reflected, (but the implementation is correct i think)
+        [R.Direction, R.Origin, R.Intensity, T.Direction, T.Origin, T.Intensity] = ...
+         LiterofLight(Surface.Normal, Surface.Vertices, Surface.BoundaryFacets, ...
+         Light.Direction, Light.Origin, Light.Intensity, false);
+        inside=0;[R,T] = RayTrace(Surface,Light,inside);  % R represents the rays that are transmitted, T the light rays that are reflected, (but the implementation is correct i think)
 % toc
         % ignore rays that are below the "imaginary roof"
         R.Direction = R.Direction(R.Origin(:,3)>above_roof,:);
@@ -93,10 +93,11 @@ for i = 1:length(above_roof_vec)
             if sum(R.Intensity) < EPS
                 break;
             end
-%            [T.Direction, T.Origin, T.Intensity, R.Direction, R.Origin, R.Intensity] = ...
-%            LiterofLight(Surface.Normal, Surface.Vertices, Surface.BoundaryFacets, ...
-%            R.Direction, R.Origin, R.Intensity, true);
-             [T,R] = RayTrace(Surface,R);
+            
+            [T.Direction, T.Origin, T.Intensity, R.Direction, R.Origin, R.Intensity] = ...
+            LiterofLight(Surface.Normal, Surface.Vertices, Surface.BoundaryFacets, ...
+            R.Direction, R.Origin, R.Intensity, true);
+            inside=1;[T,R] = RayTrace(Surface,R,inside);
 
             %ignore rays hitting the bottle cap
             R.Direction = R.Direction(R.Origin(:,3)<28.1,:);
