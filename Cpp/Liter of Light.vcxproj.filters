@@ -67,5 +67,8 @@
     <None Include="Data\SurfaceVertex.dat">
       <Filter>Data Files</Filter>
     </None>
+    <None Include="..\Cocacola_bottle.stl">
+      <Filter>Data Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
