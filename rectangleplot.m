@@ -4,8 +4,8 @@
 loaded = load('Bottle.mat');
 vert = 0.5*loaded.vert;
 
-above_roof=16;
-IncidenceAngle=81;
+above_roof=0;
+IncidenceAngle=65;
 %
 diameter=max(vert(:,2))-min(vert(:,2));
 f=diameter;
@@ -15,14 +15,18 @@ G = gca;
 hold on
 init = struct;
 Surface = createSurface(vert);
+plot(Surface.Bottle,'FaceAlpha',0.2,'FaceLighting','gouraud','BackFaceLighting','unlit');
 %
 vert2=vert(vert(:,2)<0.1,:);
 vert2=vert2(vert2(:,2)>-0.1,:);
+vert2=vert2(vert2(:,1)>0,:);
 vert2=vert2(vert2(:,3)<= above_roof,:);
 [~,i]=min(abs(vert2(:,3)-above_roof));
 %vert(i,3)=above_roof;
 bottleroof=vert2(i,:);
-
+if above_roof < 20
+    bottleroof(1,1)=4.33;
+end
 
 %
 
@@ -66,7 +70,7 @@ Light.Direction=Direction;
 Light.Origin=Origin;
 
 %distance lightsource
-dist=30;
+dist=40;
 lambda=-dist;
 X1=[Light.Origin(1,1), Light.Origin(1,1)+lambda*Light.Direction(1,1)];
 Y1=[Light.Origin(1,2), Light.Origin(1,2)+lambda*Light.Direction(1,2)];
@@ -97,7 +101,7 @@ G=gca;
 plot3(G,[recm1(1,1),maxpoint(1,1)],[recm1(1,2),maxpoint(1,2)],[recm1(1,3),maxpoint(1,3)],'r-');
 view(3);
 
-G.ZLim = [-10, 60];
+G.ZLim = [above_roof, 80];
 G.XLim = [-30, 45];
 G.YLim = [-30, 30];
 

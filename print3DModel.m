@@ -10,19 +10,19 @@ tic
 loaded = load('Bottle.mat');
 vert = 0.5*loaded.vert;
 
-rng(20);  % fix seed (helpful for testing)
+%rng(20);  % fix seed (helpful for testing)
 
 % Initialize some data vectors for later analysis
-above_roof_vec=13; % choose numbers in [0,29]
-IncidenceAngleVec = 180/pi*acos(0.968);
-%IncidenceAngleVec = 180/pi*acos([0.197,0.424,0.627,0.792,0.908,0.968,0.966, ...
-%    0.904,0.785,0.618,0.413,0.186]); %Values for Venezuela (Caracas), June 16th 2017, [7,...,18] o'clock
+above_roof_vec=0:29; % choose numbers in [0,29]
+%IncidenceAngleVec = 180/pi*acos(0.968);
+IncidenceAngleVec = 180/pi*acos([0.197,0.424,0.627,0.792,0.908,0.968,0.966, ...
+    0.904,0.785,0.618,0.413,0.186]); %Values for Venezuela (Caracas), June 16th 2017, [7,...,18] o'clock
 InBottleVec = zeros(length(above_roof_vec),length(IncidenceAngleVec));
 OnBottleVec = zeros(length(above_roof_vec),length(IncidenceAngleVec));
 BottleIntensityVec = zeros(length(above_roof_vec),length(IncidenceAngleVec));
 
 %number of sun rays
-n_rays=100;
+n_rays=8000;
 
 init = struct;
 Surface = createSurface(vert);
@@ -53,7 +53,7 @@ for i = 1:length(above_roof_vec)
         [R.Direction, R.Origin, R.Intensity, T.Direction, T.Origin, T.Intensity] = ...
          LiterofLight(Surface.Normal, Surface.Vertices, Surface.BoundaryFacets, ...
          Light.Direction, Light.Origin, Light.Intensity, false);
-        inside=0;[R,T] = RayTrace(Surface,Light,inside);  % R represents the rays that are transmitted, T the light rays that are reflected, (but the implementation is correct i think)
+%        inside=0;[R,T] = RayTrace(Surface,Light,inside);  % R represents the rays that are transmitted, T the light rays that are reflected, (but the implementation is correct i think)
 % toc
         % ignore rays that are below the "imaginary roof"
         R.Direction = R.Direction(R.Origin(:,3)>above_roof,:);
@@ -78,10 +78,10 @@ for i = 1:length(above_roof_vec)
         OnBottleVec(i,j)=sum(R.Intensity)+sum(T.Intensity);
         InBottleVec(i,j)=sum(R.Intensity);
 
-         disp(['Radient flux on bottle surface: ',num2str(OnBottleVec(i,j))])
+        %disp(['Radient flux on bottle surface: ',num2str(OnBottleVec(i,j))])
         InBottleVec(i,j)=sum(R.Intensity);
-         disp(['Radient flux transmitted into the bottle: ', ...
-             num2str(InBottleVec(i,j))])
+        %disp(['Radient flux transmitted into the bottle: ', ...
+        %     num2str(InBottleVec(i,j))])
         
         intensity = 0;
         
@@ -95,9 +95,9 @@ for i = 1:length(above_roof_vec)
             end
             
             [T.Direction, T.Origin, T.Intensity, R.Direction, R.Origin, R.Intensity] = ...
-            LiterofLight(Surface.Normal, Surface.Vertices, Surface.BoundaryFacets, ...
-            R.Direction, R.Origin, R.Intensity, true);
-            inside=1;[T,R] = RayTrace(Surface,R,inside);
+             LiterofLight(Surface.Normal, Surface.Vertices, Surface.BoundaryFacets, ...
+             R.Direction, R.Origin, R.Intensity, true);
+%            inside=1;[T,R] = RayTrace(Surface,R,inside);
 
             %ignore rays hitting the bottle cap
             R.Direction = R.Direction(R.Origin(:,3)<28.1,:);
@@ -124,8 +124,8 @@ for i = 1:length(above_roof_vec)
             C{i,j,k} = T;
 %             printRays(T,10,'b');
 
-             disp(['Radient flux emitted from bottle under the roof: ', ...
-                 num2str(sum(T.Intensity))]);
+            %disp(['Radient flux emitted from bottle under the roof: ', ...
+            %    num2str(sum(T.Intensity))]);
         end
         x = (i-1)*length(IncidenceAngleVec);
         waitbar((x+j)/iter,h,['Calculating...', ...
@@ -133,8 +133,8 @@ for i = 1:length(above_roof_vec)
 
         BottleIntensityVec(i,j)=BottleIntensity;
 
-         disp(['Total radient flux emitted from bottle under the roof: ', ...
-             num2str(BottleIntensity)])
+        %disp(['Total radient flux emitted from bottle under the roof: ', ...
+        % num2str(BottleIntensity)])
     end
 end
 close(h)
