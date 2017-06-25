@@ -1,4 +1,4 @@
-function [Refraction,Reflection] = RayTrace( Surface , Light)
+function [Refraction,Reflection] = RayTrace( Surface , Light , inside)
 %RAYTRACE Computes ray tracing for light rays
 %   Computes intersection of light rays given in Light.Origin with
 %   direction Light.Direction onto a triangular surface given in Surface
@@ -9,7 +9,7 @@ function [Refraction,Reflection] = RayTrace( Surface , Light)
 %   triangles on surface as Refraction.Origin and their direction via
 %   Fresnel's equations and Snell's Law (external function)
     
-    G = gca; %get current axes
+%     G = gca; %get current axes
     
     % assert that the input variable "Light" is a matlab struct
     if isstruct(Light)
@@ -50,11 +50,12 @@ function [Refraction,Reflection] = RayTrace( Surface , Light)
     
     for raynum = 1:numel(Light.Origin)/3
         
-        % Checking which light rays are poissibly hit by the light ray that
+        % Checking which triangles are possibly hit by the light ray that
         % is currently observed
         %
         % NOTE: may be unstable!
-        if norm(Light.Origin(raynum,:) - Surface.Bottle.Points(Surface.Bottle.nearestNeighbor(Light.Origin(raynum,:)),:),2) < 2.25
+        %if norm(Light.Origin(raynum,:) - Surface.Bottle.Points(Surface.Bottle.nearestNeighbor(Light.Origin(raynum,:)),:),2) < 2.25
+        if inside==1
             possiblelightrays = find(Surface.Normal*Light.Direction(raynum,:)'>0);
         else
             possiblelightrays = find(Surface.Normal*Light.Direction(raynum,:)'<0);
@@ -88,7 +89,7 @@ function [Refraction,Reflection] = RayTrace( Surface , Light)
             % - beta>0 & beta<1: same for one point from above and the 
             % remaining point
             % - beta + gamma <1: it lies not outside the triangle
-            if ((beta > 0 && beta < 1) && (gamma > 0 && gamma < 1) && (t >0) && (beta+gamma<1)) %what happens if gamma=1 | beta = 1?    
+            if ((beta > 0 && beta < 1) && (gamma > 0 && gamma < 1) && (t >0) && (beta+gamma<1)) %what happens if gamma=1 | beta = 1?
                 if (Contact.Ray_t(raynum) == 0)
                     Contact.Ray_t(raynum) = t;
                     Contact.Facet(raynum) = i;
@@ -126,7 +127,8 @@ function [Refraction,Reflection] = RayTrace( Surface , Light)
             
             % compute new ray directions using Snell's Law
             %if Surface.Bottle.inShape(Light.Origin(raynum,:))
-            if norm(Light.Origin(raynum,:) - Surface.Bottle.Points(Surface.Bottle.nearestNeighbor(Light.Origin(raynum,:)),:),2) < 2.25
+            %if norm(Light.Origin(raynum,:) - Surface.Bottle.Points(Surface.Bottle.nearestNeighbor(Light.Origin(raynum,:)),:),2) < 2.25
+            if inside==1
                 [Reflection.Direction(raynum,:),Refraction.Direction(raynum,:),...
                 Reflection.Intensity(raynum,:),Refraction.Intensity(raynum,:)]...
                 = snellsLaw(-Surface.Normal(Contact.Facet(raynum),:), Light.Direction(raynum,:),...

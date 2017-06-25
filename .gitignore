@@ -1,1 +1,12 @@
 *.asv
+*.user
+Cpp/.vs/
+Cpp/Debug/
+Cpp/Release/
+Cpp/x64/
+/LiterofLight.pdb
+/LiterofLight.map
+/LiterofLight.lib
+/LiterofLight.exp
+Cpp/.metadata/
+Cpp/.settings/

@@ -10,7 +10,7 @@ function [ Light ] = createLight( Direction, Origin, varargin )
 %   Light.Origin        : representing the starting points of the light
 %                         rays specified by Origin
 
-    G = gca; %get current axes
+%     G = gca; %get current axes
 
     % new struct for light rays:
     Light = struct;
