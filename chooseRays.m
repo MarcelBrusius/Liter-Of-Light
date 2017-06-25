@@ -18,10 +18,14 @@ vert2=vert(vert(:,2)<-0.0078,:);
 vert2=vert2(vert2(:,2)>-0.01,:);
 
 %Finding the bottle point in this plane which is nearest to above_roof
+vert2=vert2(vert2(:,1)>0,:);
 vert2=vert2(vert2(:,3)<= above_roof,:);
 [~,i]=min(abs(vert2(:,3)-above_roof));
 %vert(i,3)=above_roof;
 bottleroof=vert2(i,:);
+if above_roof < 20
+    bottleroof(1,1)=4.33;
+end
 
 
 %Find vector in x1-x3-plane which fulfills the given elevation angle
@@ -70,10 +74,10 @@ Origin=m + rn(:,1)*e*v + (f*rn(:,2)-0.5*f)*[0 -1 0];
 Direction=-b;
 
 %inital_ray_intensity:
-%started with an irradiance of 1000 W/m^2
+%started with an irradiance of 1000 W/m^2, corrected it down to 700W/m^2
 %scaled with the irradiated area
 %and the number of rays
-Intensity=1000*area/n_rays;
+Intensity=700*area/n_rays;
 
 
 

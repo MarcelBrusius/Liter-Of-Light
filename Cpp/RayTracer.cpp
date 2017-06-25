@@ -52,6 +52,8 @@ void Fresnel(double n1, double n2, double c1, double c2, Light *Reflection, Ligh
 	Reflection->Intensity[raynumber] = Reflectance * light->Intensity[raynumber];
 	//conservation of energy
 	Refraction->Intensity[raynumber] = (1 - Reflectance) * light->Intensity[raynumber];
+
+	return;
 }
 
 void snellsLaw(Vector3d normal, Light *Reflection, Light *Refraction, Light *light, double n1, double n2, int raynumber)
@@ -96,7 +98,7 @@ void snellsLaw(Vector3d normal, Light *Reflection, Light *Refraction, Light *lig
 
 		Refraction->Direction[raynumber].normalize();
 	}
-	else 
+	else
 	{
 		Refraction->Direction[raynumber] = { 0,0,0 };
 		Refraction->Intensity[raynumber] = 0;
@@ -106,6 +108,8 @@ void snellsLaw(Vector3d normal, Light *Reflection, Light *Refraction, Light *lig
 
 	Reflection->Direction[raynumber] = light->Direction[raynumber] + 2 * cos_theta_1 * normal;
 	Reflection->Direction[raynumber].normalize();
+
+	return;
 }
 
 void RayTracer(Light *light, Light *Reflection, Light *Refraction, Surface *surface, bool inside)
@@ -127,15 +131,12 @@ void RayTracer(Light *light, Light *Reflection, Light *Refraction, Surface *surf
 	//			- *surface: pointer to data holding surface information
 	//			- inside: boolean specifying if the ray originated from inside the object or not
 
-	time_t stop = 0;
 	Contact contact;
 	contact.RayNumber = vector<double>(surface->NumFacets);
 	contact.Vertices = vector<Vector3d>(surface->NumFacets);
 	//contact.BoundaryFacet = vector<Vector3d>(light.RayNumber);
 	contact.Facets = vector<double>(surface->NumFacets, -1);
 	contact.Distance = vector<double>(light->RayNumber, INF);
-	for (int i = 0; i < surface->Normal.size(); ++i)
-		surface->Normal[i].normalize();
 
 	for (int ray = 0; ray < light->RayNumber; ++ray)
 	{
@@ -173,9 +174,9 @@ void RayTracer(Light *light, Light *Reflection, Light *Refraction, Surface *surf
 			double beta = dety / det;
 			double gamma = detz / det;
 
-			if ((t > EPS) && (beta > 0) && (gamma > 0) && (beta < 1) && (gamma < 1) && (beta + gamma < 1))
+			if ((t > 0) && (beta > 0) && (gamma > 0) && (beta < 1) && (gamma < 1) && (beta + gamma < 1))
 			{
-				if ((contact.Distance[ray] > t) && (t > EPS))
+				if (contact.Distance[ray] > t)
 				{
 					contact.RayNumber[j] = ray;
 					contact.Distance[ray] = t;
@@ -198,5 +199,17 @@ void RayTracer(Light *light, Light *Reflection, Light *Refraction, Surface *surf
 				snellsLaw(surface->Normal[contact.Facets[ray]], Reflection, Refraction, light, 1.0, 1.33, ray);
 			}
 		}
+		/*else
+		{
+			Reflection->Origin[ray] = Vector3d(0, 0, 0);
+			Refraction->Origin[ray] = Vector3d(0, 0, 0);
+
+			Reflection->Direction[ray] = Vector3d(0, 0, 0);
+			Refraction->Direction[ray] = Vector3d(0, 0, 0);
+
+			Reflection->Intensity[ray] = 0;
+			Refraction->Intensity[ray] = 0;
+		}*/
 	}
+	return;
 }

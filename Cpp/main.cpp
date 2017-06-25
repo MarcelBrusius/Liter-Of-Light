@@ -31,6 +31,7 @@ using namespace Eigen;
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
+	clock_t start = clock();
 	// ---- Assert input and output count ---------------------------------------------------------
 	if (nrhs != 7)
 	{
@@ -114,14 +115,14 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 
 	// get boolean specifying inside/outside
 	
-	double *insideData = mxGetPr(prhs[6]);
+	double inside = mxGetScalar(prhs[6]);
 	size_t insideSize = mxGetNumberOfDimensions(prhs[6]);
 	const mwSize *insideNum = mxGetDimensions(prhs[6]);
 	if ((insideSize > 2) || (insideNum[0] > 1))
 	{
 		mexErrMsgTxt("Expected boolean value but was given an array.");
 	}
-	bool inside = (bool)&insideData;
+	(bool)inside;//  = (bool)&insideData;
 
 	// ---- Mex2Eigen Light -----------------------------------------------------------------------
 
@@ -205,11 +206,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 	Refraction.Intensity = vector<double>(light.RayNumber,0);
 	Light *Refract = &Refraction, *Reflect = &Reflection;
 
-	clock_t start = clock();
 	RayTracer(lightPtr, Reflect, Refract, surfacePtr, inside);
-	clock_t end = clock();
-
-	mexPrintf("Elapsed time is           : %f \n", (double)(end - start) / (double)CLOCKS_PER_SEC);
+	
 	//mexPrintf("Incoming light intensity  : %f \n", sumVector(light.Intensity));
 	//mexPrintf("Reflected light intensity : %f \n", sumVector(Reflection.Intensity));
 	//mexPrintf("Refracted light intensity : %f \n", sumVector(Refraction.Intensity));
@@ -260,4 +258,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 		RefractionIntensity[i] = Refraction.Intensity[i];
 		ReflectionIntensity[i] = Reflection.Intensity[i];
 	}
+	clock_t end = clock();
+
+	mexPrintf("Elapsed time is           : %f \n", (double)(end - start) / (double)CLOCKS_PER_SEC);
+	return;
 }
