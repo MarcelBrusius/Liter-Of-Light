@@ -13,7 +13,7 @@ vert = 0.5*loaded.vert;
 %rng(20);  % fix seed (helpful for testing)
 
 % Initialize some data vectors for later analysis
-above_roof_vec=0:29; % choose numbers in [0,29]
+above_roof_vec=13.86; % choose numbers in [0,29]
 %IncidenceAngleVec = 180/pi*acos(0.968);
 IncidenceAngleVec = 180/pi*acos([0.197,0.424,0.627,0.792,0.908,0.968,0.966, ...
     0.904,0.785,0.618,0.413,0.186]); %Values for Venezuela (Caracas), June 16th 2017, [7,...,18] o'clock
@@ -22,7 +22,7 @@ OnBottleVec = zeros(length(above_roof_vec),length(IncidenceAngleVec));
 BottleIntensityVec = zeros(length(above_roof_vec),length(IncidenceAngleVec));
 
 %number of sun rays
-n_rays=8000;
+n_rays=100;
 
 init = struct;
 Surface = createSurface(vert);
@@ -36,6 +36,7 @@ height = 10; % number of iterations of refraction/reflection
 C = cell(length(above_roof_vec),length(IncidenceAngleVec),height);
 iter = length(above_roof_vec)*length(IncidenceAngleVec);
 
+%%{
 for i = 1:length(above_roof_vec)
     above_roof=above_roof_vec(i);
     for j=1:length(IncidenceAngleVec) %elevation angle,i.e. incidence angle w.r.t. the horizontal
@@ -150,6 +151,21 @@ disp(['            Initial intensity : ', num2str(sum(C{row,col,1}.Intensity))])
 disp(['Resulting intensity (maximal) : ', num2str(BottleIntensityVec(row,col))]);
 disp(['         Efficiency (maximal) : ', num2str(BottleIntensityVec(row,col)/...
     sum(C{row,col,1}.Intensity))]);
+
+%}
+
+
+% light intensity with just a plastic sheet over the hole in the roof
+%%{
+maxRadius=4.33/100; % The radius of bottle in meter at height 13.86
+noBottleIntensityVec=zeros(1,length(IncidenceAngleVec));
+for j=1:length(IncidenceAngleVec)
+    [~,dir,~]=chooseRays(15, IncidenceAngleVec(j), n_rays);
+    [~,~,~,refractedInt]=snellsLaw([0,0,1],dir,700,1,1.33);
+    noBottleIntensityVec(j)=pi*maxRadius^2*cos(pi/180*IncidenceAngleVec(j))*refractedInt;
+end
+%}
+
 
 % Print results only if requested ( printresults == 1 ):
 % printresults = 0;

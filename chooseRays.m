@@ -2,7 +2,7 @@ function [Origin,Direction,Intensity] = chooseRays(above_roof, IncidenceAngle, n
 %CHOOSERAYS computes the Origin points, the Direction vector
 %and the Intensity for the sun rays, depending on
 % - above_roof: level of roof w.r.t bottle
-% - IncidenceAngle: elevation angle in degrees
+% - IncidenceAngle: zenith angle in degrees
 % - n_rays : number of rays
 
 loaded = load('Bottle.mat');
@@ -34,7 +34,7 @@ end
 %Calculate vector v in x1-x3-plane, which is normal to b
 if IncidenceAngle > 0
     b3=25;
-    b1=abs(cos(IncidenceAngle*pi/180))*b3/(sqrt(1-(cos(IncidenceAngle*pi/180))^2));
+    b1=abs(cos((90-IncidenceAngle)*pi/180))*b3/(sqrt(1-(cos((90-IncidenceAngle)*pi/180))^2));
     v3=10;
     v1=-v3*b3/b1;
 else
